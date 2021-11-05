@@ -60,7 +60,7 @@ def tuple_parser(root: ET.Element):
             event_args.append(ev_arg)
 
 
-    print("| ".join(["; ".join(w) for w in event_args]))
+    print("|".join([";".join(w) for w in event_args]))
 
 
 

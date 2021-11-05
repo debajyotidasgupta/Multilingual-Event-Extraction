@@ -14,7 +14,55 @@ def sent_parser(root: ET.Element):
 
 
 def tuple_parser(root: ET.Element):
-    pass
+    events = {}
+    for tag in root.iter():
+        if tag.tag.endswith("_EVENT"):
+            phrase = [w.text.strip() for w in tag.findall(".//W")]
+            events[tag.attrib["ID"]] = {
+                "id": tag.attrib["ID"],
+                "name": tag.tag,
+                "type": tag.attrib["TYPE"],
+                "phrase": " ".join(phrase),
+                "found_arg": False
+            }
+    
+    event_args = []
+    for tag in root.iter():
+        if tag.tag.endswith("-ARG"):
+            try:
+                event_id = tag.find("./LINK").get("EVENT_ARG")
+                phrase = [w.text.strip() for w in tag.findall(".//W")]
+                ev_arg = (
+                    events[event_id]["phrase"],
+                    events[event_id]["name"] + ":" + events[event_id]["type"],
+                    " ".join(phrase),
+                    tag.tag                    
+                )
+                event_args.append(ev_arg)
+                events[event_id]["found_arg"] = True
+            except:
+                ev_arg = (
+                    "[unused 1]",
+                    "[unused 1]",
+                    " ".join(phrase),
+                    tag.tag                    
+                )
+                event_args.append(ev_arg)
+
+    for v in events.values():
+        if not v["found_arg"]:
+            ev_arg = (
+                    v["phrase"],
+                    v["name"] + ":" + v["type"],
+                    "[unused 2]",
+                    "[unused 2]"               
+                )
+            event_args.append(ev_arg)
+
+
+    print("| ".join(["; ".join(w) for w in event_args]))
+
+
 
 def pointer_parser(root: ET.Element):
     pass

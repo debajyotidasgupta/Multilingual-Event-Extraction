@@ -25,7 +25,7 @@ def tuple_parser(root: ET.Element):
                 "phrase": " ".join(phrase),
                 "found_arg": False
             }
-    
+
     event_args = []
     for tag in root.iter():
         if tag.tag.endswith("-ARG"):
@@ -36,7 +36,7 @@ def tuple_parser(root: ET.Element):
                     events[event_id]["phrase"],
                     events[event_id]["name"] + ":" + events[event_id]["type"],
                     " ".join(phrase),
-                    tag.tag                    
+                    tag.tag
                 )
                 event_args.append(ev_arg)
                 events[event_id]["found_arg"] = True
@@ -45,27 +45,77 @@ def tuple_parser(root: ET.Element):
                     "[unused 1]",
                     "[unused 1]",
                     " ".join(phrase),
-                    tag.tag                    
+                    tag.tag
                 )
                 event_args.append(ev_arg)
 
     for v in events.values():
         if not v["found_arg"]:
             ev_arg = (
-                    v["phrase"],
-                    v["name"] + ":" + v["type"],
-                    "[unused 2]",
-                    "[unused 2]"               
-                )
+                v["phrase"],
+                v["name"] + ":" + v["type"],
+                "[unused 2]",
+                "[unused 2]"
+            )
             event_args.append(ev_arg)
-
 
     print("|".join([";".join(w) for w in event_args]))
 
 
-
 def pointer_parser(root: ET.Element):
-    pass
+    # First 2 tokens are [unused 1] and [unused 2]
+    cnt = 0
+    for w in root.findall(".//W"):
+        w.set("count", cnt + 2)
+        cnt += 1
+
+    events = {}
+    for tag in root.iter():
+        if tag.tag.endswith("_EVENT"):
+            idxs = [w.attrib["count"] for w in tag.findall(".//W")]
+            events[tag.attrib["ID"]] = {
+                "id": tag.attrib["ID"],
+                "name": tag.tag,
+                "type": tag.attrib["TYPE"],
+                "start": str(min(idxs)),
+                "end": str(max(idxs)),
+                "found_arg": False
+            }
+
+    event_args = []
+    for tag in root.iter():
+        if tag.tag.endswith("-ARG"):
+            try:
+                event_id = tag.find("./LINK").get("EVENT_ARG")
+                idxs = [w.attrib["count"] for w in tag.findall(".//W")]
+                ev_arg = (
+                    events[event_id]["start"], events[event_id]["end"],
+                    events[event_id]["name"] + ":" + events[event_id]["type"],
+                    str(min(idxs)), str(max(idxs)),
+                    tag.tag
+                )
+                event_args.append(ev_arg)
+                events[event_id]["found_arg"] = True
+            except:
+                ev_arg = (
+                    "0", "0",
+                    "[unused 1]",
+                    str(min(idxs)), str(max(idxs)),
+                    tag.tag
+                )
+                event_args.append(ev_arg)
+
+    for v in events.values():
+        if not v["found_arg"]:
+            ev_arg = (
+                v["start"], v["end"],
+                v["name"] + ":" + v["type"],
+                "1", "1",
+                "[unused 2]"
+            )
+            event_args.append(ev_arg)
+
+    print("|".join([";".join(w) for w in event_args]))
 
 
 if __name__ == "__main__":
@@ -77,7 +127,7 @@ if __name__ == "__main__":
         directory = "../data"
     else:
         directory = argv[2]
-    
+
     mode = argv[1]
 
     all_files = []
@@ -96,7 +146,7 @@ if __name__ == "__main__":
             all_files.index(os.path.splitext(name)[0] + ".xml")
         except Exception as e:
             print(e, file=stderr)
-            
+
     print("Total", len(all_files), "files detected", file=stderr)
 
     for fname in all_files:

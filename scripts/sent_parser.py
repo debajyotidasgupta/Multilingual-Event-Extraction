@@ -5,11 +5,15 @@ from sys import argv, exit, stderr
 import xml.etree.ElementTree as ET
 from pprint import pprint
 
-if len(argv) != 2:
-    print("Usage: python3 sent_parser.py <directory>")
+if len(argv) > 2:
+    print("Usage: python3 sent_parser.py [OPTIONAL:<directory>]")
     exit(-1)
 
-dirname = argv[1]
+if len(argv) == 1:
+    directory = "../data"
+else:
+    directory = argv[1]
+
 all_files = []
 
 all_text_files = []

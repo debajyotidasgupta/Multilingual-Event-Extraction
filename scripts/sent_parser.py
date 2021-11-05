@@ -18,7 +18,7 @@ all_files = []
 
 all_text_files = []
 
-for root, _, files in os.walk(dirname):
+for root, _, files in os.walk(directory):
     for name in files:
         if os.path.splitext(name)[1] == ".xml":
             all_files.append(os.path.join(root, name))

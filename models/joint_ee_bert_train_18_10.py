@@ -48,11 +48,11 @@ def get_data(src_lines, trg_lines, pos_lines, datatype):
     for i in range(0, len(src_lines)):  # for each line
         src_line = src_lines[i].strip()
         trg_line = trg_lines[i].strip()
-        pos_line = pos_lines[i].strip()
+        #pos_line = pos_lines[i].strip()
         src_words = src_line.split()
-        word_pos_tags = pos_line.split()
+        #word_pos_tags = pos_line.split()
 
-        trg_rels = []  # holds relations present in a sentence
+        #trg_rels = []  # holds relations present in a sentence
         trg_events = []  # holds events present in a sentence
         trg_args = []  # holds arguments present in a sentence
         trg_pointers = []  # holds tuples containg records per relation
@@ -67,9 +67,9 @@ def get_data(src_lines, trg_lines, pos_lines, datatype):
 
         tuples_in = []
         for part in parts:
-            elements = part.strip().split()
+            elements = part.strip().split(";")
             tuples_in.append((int(elements[0]), int(elements[1]), eventnameToIdx[elements[2]], int(
-                elements[3]), int(elements[4]), argnameToIdx[elements[5]], relnameToIdx[elements[6]]))
+                elements[3]), int(elements[4]), argnameToIdx[elements[5]]))
 
         if datatype == 1:
             tuples_in = sorted(
@@ -78,7 +78,7 @@ def get_data(src_lines, trg_lines, pos_lines, datatype):
             #elements = part.strip().split()
             # print(elements)
             # relation index (corresponding to the relation_name from relation_vocab)
-            trg_rels.append(elements[6])
+            # trg_rels.append(elements[6])
             trg_events.append(elements[2])  # event index
             trg_args.append(elements[5])  # arg index
             # all the records like event-start_index, end_index, entity- start_index, end_index
@@ -86,13 +86,16 @@ def get_data(src_lines, trg_lines, pos_lines, datatype):
                 elements[1]), int(elements[3]), int(elements[4])))
 
         # if cross max_sentence_length or max_trg_length(max no of relation tuples present in the sentence)
-        if datatype == 1 and (len(src_words) > max_src_len or len(trg_rels) > max_trg_len):
+        if datatype == 1 and (len(src_words) > max_src_len):
             # print(src_line)
             # print(trg_line)
             continue
 
-        sample = Sample(Id=uid, SrcLen=len(src_words), SrcWords=src_words, PosTags=word_pos_tags, TrgLen=len(trg_rels), TrgRels=trg_rels,
-                        TrgPointers=trg_pointers, eventTypes=trg_events, argTypes=trg_args)  # recordclass("Sample", "Id SrcLen SrcWords TrgLen TrgRels eventTypes argTypes TrgPointers")
+        # sample = Sample(Id=uid, SrcLen=len(src_words), SrcWords=src_words, PosTags=word_pos_tags, TrgLen=len(trg_rels), TrgRels=trg_rels,
+        #                 TrgPointers=trg_pointers, eventTypes=trg_events, argTypes=trg_args)  # recordclass("Sample", "Id SrcLen SrcWords TrgLen TrgRels eventTypes argTypes TrgPointers")
+        sample = Sample(Id=uid, SrcLen=len(src_words), SrcWords=src_words,TrgLen=len(parts),
+                        TrgPointers=trg_pointers, eventTypes=trg_events, argTypes=trg_args)
+        
         samples.append(sample)
         uid += 1
     return samples
@@ -110,16 +113,16 @@ def read_data(src_file, trg_file, pos_dev_file, datatype):
     trg_lines = reader.readlines()
     reader.close()
 
-    reader = open(pos_dev_file)
-    pos_lines = reader.readlines()
-    reader.close()
+    # reader = open(pos_dev_file)
+    # pos_lines = reader.readlines()
+    # reader.close()
 
     # l = 1000
     # src_lines = src_lines[0:min(l, len(src_lines))]
     # trg_lines = trg_lines[0:min(l, len(trg_lines))]
     # adj_lines = adj_lines[0:min(l, len(adj_lines))]
 
-    data = get_data(src_lines, trg_lines, pos_lines,
+    data = get_data(src_lines, trg_lines, None,
                     datatype)  # call get_data()
     return data  # list of records, records are of type Sample
 
@@ -350,6 +353,7 @@ def get_F1(data, preds):
         gt_triples = get_gt_triples(
             data[i].SrcWords, data[i].TrgRels, data[i].TrgPointers, data[i].eventTypes, data[i].argTypes)
 
+        #NEED INDEX CHANGES, 0-RELATIONS
         pred_triples, all_pred_triples = get_pred_triples(preds[0][i], preds[1][i], preds[2][i], preds[3][i],
                                                           preds[4][i], preds[5][i], preds[6][i], data[i].SrcWords)
         total_pred_pos += len(all_pred_triples)
@@ -730,7 +734,7 @@ def get_batch_data(cur_samples, is_training=False):
         src_words_mask_list.append(get_padded_mask(
             sample.SrcLen, batch_src_max_len))
         # call get_char_seq(): [character index sequence with padded for CNN processing]
-        src_char_seq.append(get_char_seq(sample.SrcWords, batch_src_max_len))
+        # src_char_seq.append(get_char_seq(sample.SrcWords, batch_src_max_len))
         # cur_masked_adj = np.zeros((batch_src_max_len, batch_src_max_len), dtype=np.float32)#skip
         # cur_masked_adj[:len(sample.SrcWords), :len(sample.SrcWords)] = sample.AdjMat#skip
         # adj_lst.append(cur_masked_adj)#skip
@@ -738,8 +742,8 @@ def get_batch_data(cur_samples, is_training=False):
         positional_index_list.append(get_positional_index(
             len(sample.SrcWords), batch_src_max_len))
         # each element is [list of tag index of each word in the sentence of length max_src_len]
-        src_pos_tag_seq.append(get_pos_tag_index_seq(
-            sample.PosTags, batch_src_max_len))
+        # src_pos_tag_seq.append(get_pos_tag_index_seq(
+        #     sample.PosTags, batch_src_max_len))
 
         if is_training:
             # list of all the start index of the tuple's event in a sentence with padding -1 (to max_trg_len)
@@ -755,8 +759,8 @@ def get_batch_data(cur_samples, is_training=False):
             entity_end_seq.append(get_padded_pointers_arg(
                 sample.TrgPointers, 3, batch_trg_max_len))
             # list of all the relation index(from rel_vocab) padded with 'NA' and '<Pad>'
-            rel_seq.append(get_padded_relations(
-                sample.TrgRels, batch_trg_max_len))
+            # rel_seq.append(get_padded_relations(
+            #     sample.TrgRels, batch_trg_max_len))
 
             # list of all the event index(from event_vocab) padded with <Pad>'
             event_seq.append(get_padded_events(
@@ -765,8 +769,10 @@ def get_batch_data(cur_samples, is_training=False):
             arg_seq.append(get_padded_args(sample.argTypes, batch_trg_max_len))
 
             # list of all the relation index(from rel_vocab) padded with 'None' and '<Pad>'
-            decoder_input_list.append(get_relation_index_seq(
-                sample.TrgRels, batch_trg_max_len))
+            # decoder_input_list.append(get_relation_index_seq(
+            #     sample.TrgRels, batch_trg_max_len))
+            decoder_input_list.append(get_padded_events(
+                sample.eventTypes, batch_trg_max_len))
 
             # list of length max_trg_len where each item is a list of size max_src_len. Each item of that list is mask where all but start and end index of entity_1 (and entity_2) set to 1 (respectively).
             trigger_mask, entity_mask = get_entity_masks(
@@ -774,7 +780,8 @@ def get_batch_data(cur_samples, is_training=False):
             trigger_mask_seq.append(trigger_mask)
             entity_mask_seq.append(entity_mask)
         else:
-            decoder_input_list.append(get_relation_index_seq([], 1))
+            # decoder_input_list.append(get_relation_index_seq([], 1))
+            decoder_input_list.append(get_padded_events([],1))
 
     return {'src_words': np.array(src_words_list, dtype=np.float32),  # list of word_index
             'bert_mask': np.array(bert_mask_list),
@@ -929,7 +936,7 @@ class Encoder(nn.Module):
 
     def forward(self, words, bert_mask, pos_tag_seq, chars, pos_seq, is_training=False):
         bert_embeds = self.bert_vec(words, bert_mask, is_training)
-        word_input = bert_embeds
+        words_input = bert_embeds
         # src_word_embeds = self.word_embeddings(words)#[bs, max_seq_len, emb_dim]
         # custom_print(word_input.shape)
         pos_embeds = self.pos_embeddings(pos_tag_seq)
@@ -944,7 +951,7 @@ class Encoder(nn.Module):
         # custom_print(char_feature.shape)
 
         # [bs, max_seq_len, emb_dim=350]
-        words_input = torch.cat((word_input, pos_embeds, char_feature), -1)
+        # words_input = torch.cat((word_input, pos_embeds, char_feature), -1)
         # custom_print(words_input.shape)
 
         if enc_type == 'LSTM':
@@ -1133,7 +1140,7 @@ class Decoder(nn.Module):
         arg_types = self.argt_lin(torch.cat((ent_argt, trig_et, hidden), -1))
         #custom_print('arg_types size={}'.format(arg_types.shape))
         # [bs,9*300]---->[bs, 36]
-        rel = self.rel_lin(torch.cat((hidden, trig_et, ent_argt), -1))
+        #rel = self.rel_lin(torch.cat((hidden, trig_et, ent_argt), -1))
         #custom_print('rel size={}'.format(rel.shape))
 
         if is_training:
@@ -1141,22 +1148,24 @@ class Decoder(nn.Module):
             trig_e = F.log_softmax(trig_e, dim=-1)  # [bs,max_src_len]
             ent_s = F.log_softmax(ent_s, dim=-1)  # [bs,max_src_len]
             ent_e = F.log_softmax(ent_e, dim=-1)  # [bs,max_src_len]
-            rel = F.log_softmax(rel, dim=-1)  # [bs,max_rel_types]
+            #rel = F.log_softmax(rel, dim=-1)  # [bs,max_rel_types]
             event_types = F.log_softmax(
                 event_types, dim=-1)  # [bs, no_event_types]
             arg_types = F.log_softmax(arg_types, dim=-1)  # [bs, no_arg_types]
 
-            return rel.unsqueeze(1), trig_s.unsqueeze(1), trig_e.unsqueeze(1), ent_s.unsqueeze(1),  ent_e.unsqueeze(1), (hidden, cell_state), trig_et, ent_argt, event_types.unsqueeze(1), arg_types.unsqueeze(1)
+            # return rel.unsqueeze(1), trig_s.unsqueeze(1), trig_e.unsqueeze(1), ent_s.unsqueeze(1),  ent_e.unsqueeze(1), (hidden, cell_state), trig_et, ent_argt, event_types.unsqueeze(1), arg_types.unsqueeze(1)
+            return trig_s.unsqueeze(1), trig_e.unsqueeze(1), ent_s.unsqueeze(1),  ent_e.unsqueeze(1), (hidden, cell_state), trig_et, ent_argt, event_types.unsqueeze(1), arg_types.unsqueeze(1)
         else:
             trig_s = F.softmax(trig_s, dim=-1)
             trig_e = F.softmax(trig_e, dim=-1)
             ent_s = F.softmax(ent_s, dim=-1)
             ent_e = F.softmax(ent_e, dim=-1)
-            rel = F.softmax(rel, dim=-1)
+            # rel = F.softmax(rel, dim=-1)
             event_types = F.log_softmax(
                 event_types, dim=-1)  # [bs, no_event_types]
             arg_types = F.log_softmax(arg_types, dim=-1)  # [bs, no_arg_types]
-            return rel.unsqueeze(1), trig_s.unsqueeze(1), trig_e.unsqueeze(1), ent_s.unsqueeze(1), ent_e.unsqueeze(1), (hidden, cell_state), trig_et, ent_argt, event_types.unsqueeze(1), arg_types.unsqueeze(1)
+            # return rel.unsqueeze(1), trig_s.unsqueeze(1), trig_e.unsqueeze(1), ent_s.unsqueeze(1), ent_e.unsqueeze(1), (hidden, cell_state), trig_et, ent_argt, event_types.unsqueeze(1), arg_types.unsqueeze(1)
+            return trig_s.unsqueeze(1), trig_e.unsqueeze(1), ent_s.unsqueeze(1), ent_e.unsqueeze(1), (hidden, cell_state), trig_et, ent_argt, event_types.unsqueeze(1), arg_types.unsqueeze(1)
 
 
 class Seq2SeqModel(nn.Module):
@@ -1215,7 +1224,7 @@ class Seq2SeqModel(nn.Module):
         else:
             dec_outs = self.decoder(dec_inp, prev_tuples, dec_hid, enc_hs, src_mask, trigger, entity, None, None,
                                     is_training)
-        rel = dec_outs[0]  # [bs,1,no_of_rel_types]
+        # rel = dec_outs[0]  # [bs,1,no_of_rel_types]
         trig_s = dec_outs[1]  # [bs, 1, max_src_len]
         trig_e = dec_outs[2]  # [bs, 1, max_src_len]
         ent_s = dec_outs[3]  # [bs, 1, max_src_len]
@@ -1245,7 +1254,7 @@ class Seq2SeqModel(nn.Module):
                 dec_outs = self.decoder(dec_inp, prev_tuples, dec_hid, enc_hs, src_mask, trigger, entity, None, None,
                                         is_training)
 
-            cur_rel = dec_outs[0]
+            # cur_rel = dec_outs[0]
             cur_trig_s = dec_outs[1]
             cur_trig_e = dec_outs[2]
             cur_ent_s = dec_outs[3]
@@ -1256,7 +1265,7 @@ class Seq2SeqModel(nn.Module):
             cur_trg_type = dec_outs[8]
             cur_arg_type = dec_outs[9]
 
-            rel = torch.cat((rel, cur_rel), 1)
+            # rel = torch.cat((rel, cur_rel), 1)
             trig_s = torch.cat((trig_s, cur_trig_s), 1)
             trig_e = torch.cat((trig_e, cur_trig_e), 1)
             ent_s = torch.cat((ent_s, cur_ent_s), 1)
@@ -1266,8 +1275,8 @@ class Seq2SeqModel(nn.Module):
 
             #topv, topi = cur_rel[:, :, 1:].topk(1)
             #topi = torch.add(topi, 1)
-            rel_topv, rel_topi = cur_rel[:, :, 1:].topk(1)
-            rel_topi = torch.add(rel_topi, 1)
+            # rel_topv, rel_topi = cur_rel[:, :, 1:].topk(1)
+            # rel_topi = torch.add(rel_topi, 1)
             trg_topv, trg_topi = cur_trg_type[:, :, 1:].topk(1)
             trg_topi = torch.add(trg_topi, 1)
             arg_topv, arg_topi = cur_arg_type[:, :, 1:].topk(1)
@@ -1281,7 +1290,7 @@ class Seq2SeqModel(nn.Module):
         #custom_print('trg_type shape={}'.format(trg_type.shape))
         #custom_print('arg_type shape={}'.format(arg_type.shape))
         if is_training:
-            rel = rel.view(-1, len(relnameToIdx))
+            # rel = rel.view(-1, len(relnameToIdx))
             trig_s = trig_s.view(-1, src_time_steps)
             trig_e = trig_e.view(-1, src_time_steps)
             ent_s = ent_s.view(-1, src_time_steps)
@@ -1289,7 +1298,8 @@ class Seq2SeqModel(nn.Module):
             trg_type = trg_type.view(-1, len(eventnameToIdx))
             arg_type = arg_type.view(-1, len(argnameToIdx))
         #custom_print('execution complete for this batch')
-        return rel, trig_s, trig_e, ent_s, ent_e, trg_type, arg_type
+        # return rel, trig_s, trig_e, ent_s, ent_e, trg_type, arg_type
+        return trig_s, trig_e, ent_s, ent_e, trg_type, arg_type
 
 
 def get_model(model_id):
@@ -1381,6 +1391,7 @@ def predict(samples, model, model_id):
                 outputs = model(src_words_seq, bert_words_mask, src_pos_tags, src_words_mask, src_chars_seq, positional_seq, trg_words_seq,
                                 max_trg_len, None, None, False)
 
+        #NEED INDEX CHANGE DELETE RELATIONS
         rel += list(outputs[0].data.cpu().numpy())
         arg1s += list(outputs[1].data.cpu().numpy())
         arg1e += list(outputs[2].data.cpu().numpy())
@@ -1419,7 +1430,7 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
     if n_gpu > 1:
         model = torch.nn.DataParallel(model)
 
-    rel_criterion = nn.NLLLoss(ignore_index=0)
+    # rel_criterion = nn.NLLLoss(ignore_index=0)
 
     eType_criterion = nn.NLLLoss(ignore_index=0)
     aType_criterion = nn.NLLLoss(ignore_index=0)
@@ -1580,9 +1591,12 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
             et_seq = et_seq.view(-1, 1).squeeze()
             arg_seq = arg_seq.view(-1, 1).squeeze()
 
-            loss = rel_criterion(outputs[0], rel) + eType_criterion(outputs[5], et_seq) + aType_criterion(outputs[6], arg_seq) + wf * (pointer_criterion(
-                outputs[1], arg1s) + pointer_criterion(outputs[2], arg1e)) + wf * (pointer_criterion(outputs[3], arg2s) + pointer_criterion(outputs[4], arg2e))
+            # loss = rel_criterion(outputs[0], rel) + eType_criterion(outputs[5], et_seq) + aType_criterion(outputs[6], arg_seq) + wf * (pointer_criterion(
+            #     outputs[1], arg1s) + pointer_criterion(outputs[2], arg1e)) + wf * (pointer_criterion(outputs[3], arg2s) + pointer_criterion(outputs[4], arg2e))
 
+            loss = eType_criterion(outputs[5], et_seq) + aType_criterion(outputs[6], arg_seq) + wf * (pointer_criterion(
+                outputs[1], arg1s) + pointer_criterion(outputs[2], arg1e)) + wf * (pointer_criterion(outputs[3], arg2s) + pointer_criterion(outputs[4], arg2e))
+            
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 10.0)
             if (batch_idx + 1) % update_freq == 0:
@@ -1682,11 +1696,13 @@ update_freq = 1
 use_hadamard = False
 early_stop_cnt = 7
 
+# Sample = recordclass(
+#     "Sample", "Id SrcLen SrcWords PosTags TrgLen TrgRels eventTypes argTypes TrgPointers")
 Sample = recordclass(
-    "Sample", "Id SrcLen SrcWords PosTags TrgLen TrgRels eventTypes argTypes TrgPointers")
+    "Sample", "Id SrcLen SrcWords TrgLen eventTypes argTypes TrgPointers")
 rel_file = './joint_ee/role.txt'
-relnameToIdx, relIdxToName = get_relations(
-    rel_file)  # return relation dictionary
+# relnameToIdx, relIdxToName = get_relations(
+#     rel_file)  # return relation dictionary
 event_file = './joint_ee/event_type.txt'
 eventnameToIdx, eventIdxToName = get_events(
     event_file)  # return event dictionary
@@ -1700,20 +1716,21 @@ custom_print('loading data......')
 
 src_train_file = '../data/train_bengali.sent'
 trg_train_file = '../data/train_bengali.pointer'
-pos_train_file = '../data/train_bengali.tuple'
+# pos_train_file = '../data/train_bengali.tuple'
 
 # call read_data() for train_set
-train_data = read_data(src_train_file, trg_train_file, pos_train_file, 1)
+# train_data = read_data(src_train_file, trg_train_file, pos_train_file, 1)
+train_data = read_data(src_train_file, trg_train_file, None, 1)
 
 src_dev_file = '../data/valid_bengali.sent'
 trg_dev_file = '../data/valid_bengali.pointer'
-pos_dev_file = '../data/valid_bengali.tuple'
+# pos_dev_file = '../data/valid_bengali.tuple'
 # call read_data() for dev_set
 dev_data = read_data(src_dev_file, trg_dev_file, pos_dev_file, 2)
 
 src_test_file = '../data/test_bengali.sent'
 trg_test_file = '../data/test_bengali.pointer'
-pos_test_file = '../data/test_bengali.tuple'
+# pos_test_file = '../data/test_bengali.tuple'
 # call read_data() for dev_set
 test_data = read_data(src_test_file, trg_test_file, pos_test_file, 3)
 
@@ -1725,10 +1742,10 @@ custom_print("preparing vocabulary......")
 save_vocab = './joint_ee/vocab.pkl'
 custom_print("getting pos tags......")
 #print("getting pos tags......")
-pos_vocab = build_tags(pos_train_file, pos_dev_file, pos_test_file)
+#pos_vocab = build_tags(pos_train_file, pos_dev_file, pos_test_file)
 
-word_vocab, char_vocab, word_embed_matrix = build_vocab(
-    train_data, dev_data, test_data, save_vocab, embedding_file)  # create vocabulary and word embeddings
+# word_vocab, char_vocab, word_embed_matrix = build_vocab(
+#     train_data, dev_data, test_data, save_vocab, embedding_file)  # create vocabulary and word embeddings
 
 #print("Training started......")
 custom_print("Training started......")

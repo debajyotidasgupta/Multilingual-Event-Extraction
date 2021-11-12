@@ -1698,22 +1698,22 @@ custom_print(batch_size, '\t', num_epoch)
 custom_print(enc_type)
 custom_print('loading data......')
 
-src_train_file = 'train_bert.sent'
-trg_train_file = 'train_bert.pointer'
-pos_train_file = 'train_bert.pos'
+src_train_file = '../data/train_bengali.sent'
+trg_train_file = '../data/train_bengali.pointer'
+pos_train_file = '../data/train_bengali.tuple'
 
 # call read_data() for train_set
 train_data = read_data(src_train_file, trg_train_file, pos_train_file, 1)
 
-src_dev_file = 'dev_bert.sent'
-trg_dev_file = 'dev_bert.pointer'
-pos_dev_file = 'dev_bert.pos'
+src_dev_file = '../data/valid_bengali.sent'
+trg_dev_file = '../data/valid_bengali.pointer'
+pos_dev_file = '../data/valid_bengali.tuple'
 # call read_data() for dev_set
 dev_data = read_data(src_dev_file, trg_dev_file, pos_dev_file, 2)
 
-src_test_file = 'test_bert.sent'
-trg_test_file = 'test_bert.pointer'
-pos_test_file = 'test_bert.pos'
+src_test_file = '../data/test_bengali.sent'
+trg_test_file = '../data/test_bengali.pointer'
+pos_test_file = '../data/test_bengali.tuple'
 # call read_data() for dev_set
 test_data = read_data(src_test_file, trg_test_file, pos_test_file, 3)
 

@@ -350,8 +350,10 @@ def get_F1(data, preds):
     correct_pos = 0
     for i in range(0, len(data)):
         # [2,45,67,10],[2,5,13,7],[(1,2,6,7),(7,8,10,10),..],[23,33,1,8]
+        # gt_triples = get_gt_triples(
+        #     data[i].SrcWords, data[i].TrgRels, data[i].TrgPointers, data[i].eventTypes, data[i].argTypes)
         gt_triples = get_gt_triples(
-            data[i].SrcWords, data[i].TrgRels, data[i].TrgPointers, data[i].eventTypes, data[i].argTypes)
+            data[i].SrcWords, data[i].TrgPointers, data[i].eventTypes, data[i].argTypes)
 
         #NEED INDEX CHANGES, 0-RELATIONS
         pred_triples, all_pred_triples = get_pred_triples(preds[0][i], preds[1][i], preds[2][i], preds[3][i],
@@ -797,7 +799,7 @@ def get_batch_data(cur_samples, is_training=False):
             'event': np.array(event_seq),
             'arg': np.array(arg_seq),
             # list of relation seq padded till max_trg_len
-            'rel': np.array(rel_seq),
+            #'rel': np.array(rel_seq),
             # list of all the start index of the first entities (present in the trg_seq of len max_trg_len) padded with -1
             'trigger_start': np.array(trigger_start_seq),
             # list of all the last index of the first entities (present in the trg_seq of len max_trg_len) padded with -1
@@ -900,17 +902,17 @@ class BERT(nn.Module):
 class Encoder(nn.Module):
     def __init__(self, input_dim, hidden_dim, layers, is_bidirectional, drop_out_rate):
         super(Encoder, self).__init__()
-        self.input_dim = input_dim  # 768+char_emb+pos_emb
+        self.input_dim = input_dim  # 768+char_emb+pos_emb (768 now)
         self.hidden_dim = hidden_dim  # 150
         self.layers = layers  # 1
         self.is_bidirectional = is_bidirectional  # True
         self.drop_rate = drop_out_rate  # 0.3
         self.bert_vec = BERT(drop_out_rate)
         #self.word_embeddings = WordEmbeddings(len(word_vocab), word_embed_dim, word_embed_matrix, drop_rate)
-        self.pos_embeddings = POSEmbeddings(
-            len(pos_vocab), pos_embed_dim, drop_rate)
-        self.char_embeddings = CharEmbeddings(
-            len(char_vocab), char_embed_dim, drop_rate)
+        # self.pos_embeddings = POSEmbeddings(
+        #     len(pos_vocab), pos_embed_dim, drop_rate)
+        # self.char_embeddings = CharEmbeddings(
+        #     len(char_vocab), char_embed_dim, drop_rate)
         # self.pos_embeddings = nn.Embedding(max_positional_idx, positional_embed_dim, padding_idx=0)
         if enc_type == 'LSTM':
             self.lstm = nn.LSTM(self.input_dim, self.hidden_dim, self.layers, batch_first=True,
@@ -926,11 +928,11 @@ class Encoder(nn.Module):
             self.gcn = GCN(gcn_num_layers, 2 * self.hidden_dim, 2 * self.hidden_dim)
         '''
 
-        self.dropout = nn.Dropout(self.drop_rate)
-        self.conv1d = nn.Conv1d(
-            char_embed_dim, char_feature_size, conv_filter_size)
-        self.max_pool = nn.MaxPool1d(
-            max_word_len + conv_filter_size - 1, max_word_len + conv_filter_size - 1)
+        # self.dropout = nn.Dropout(self.drop_rate)
+        # self.conv1d = nn.Conv1d(
+        #     char_embed_dim, char_feature_size, conv_filter_size)
+        # self.max_pool = nn.MaxPool1d(
+        #     max_word_len + conv_filter_size - 1, max_word_len + conv_filter_size - 1)
         # self.mhc = 3
         # self.mha = Multi_Head_Self_Attention(self.mhc, 2 * self.hidden_dim)
 
@@ -939,15 +941,15 @@ class Encoder(nn.Module):
         words_input = bert_embeds
         # src_word_embeds = self.word_embeddings(words)#[bs, max_seq_len, emb_dim]
         # custom_print(word_input.shape)
-        pos_embeds = self.pos_embeddings(pos_tag_seq)
+        # pos_embeds = self.pos_embeddings(pos_tag_seq)
         # custom_print(pos_embeds.shape)
         # pos_embeds = self.dropout(self.pos_embeddings(pos_seq))
-        char_embeds = self.char_embeddings(chars)  # []
-        char_embeds = char_embeds.permute(
-            0, 2, 1)  # [bs, emb_dim, max_seq_len]
+        # char_embeds = self.char_embeddings(chars)  # []
+        # char_embeds = char_embeds.permute(
+        #     0, 2, 1)  # [bs, emb_dim, max_seq_len]
 
-        char_feature = torch.tanh(self.max_pool(self.conv1d(char_embeds)))
-        char_feature = char_feature.permute(0, 2, 1)
+        # char_feature = torch.tanh(self.max_pool(self.conv1d(char_embeds)))
+        # char_feature = char_feature.permute(0, 2, 1)
         # custom_print(char_feature.shape)
 
         # [bs, max_seq_len, emb_dim=350]
@@ -1014,7 +1016,7 @@ class Decoder(nn.Module):
         self.argt_lin = nn.Linear(9 * self.input_dim, len(argnameToIdx))
 
         # to identify the role
-        self.rel_lin = nn.Linear(9 * self.input_dim, len(relnameToIdx))
+        # self.rel_lin = nn.Linear(9 * self.input_dim, len(relnameToIdx))
 
         self.dropout = nn.Dropout(self.drop_rate)
         self.w = nn.Linear(9 * self.input_dim, self.input_dim)
@@ -1175,8 +1177,8 @@ class Seq2SeqModel(nn.Module):
             enc_hidden_size/2), 1, True, drop_rate)
         self.decoder = Decoder(
             dec_inp_size, dec_hidden_size, 1, drop_rate, max_trg_len)
-        self.relation_embeddings = nn.Embedding(
-            len(relnameToIdx), word_embed_dim)
+        # self.relation_embeddings = nn.Embedding(
+        #     len(relnameToIdx), word_embed_dim)
         # self.w = nn.Linear(10 * dec_inp_size, dec_inp_size)
         self.dropout = nn.Dropout(drop_rate)
 
@@ -1225,15 +1227,24 @@ class Seq2SeqModel(nn.Module):
             dec_outs = self.decoder(dec_inp, prev_tuples, dec_hid, enc_hs, src_mask, trigger, entity, None, None,
                                     is_training)
         # rel = dec_outs[0]  # [bs,1,no_of_rel_types]
-        trig_s = dec_outs[1]  # [bs, 1, max_src_len]
-        trig_e = dec_outs[2]  # [bs, 1, max_src_len]
-        ent_s = dec_outs[3]  # [bs, 1, max_src_len]
-        ent_e = dec_outs[4]  # [bs, 1, max_src_len]
-        dec_hid = dec_outs[5]  # ([bs, hid_dim],[bs, hid_dim])
-        trigger = dec_outs[6]  # [bs, 4*300]
-        entity = dec_outs[7]  # [bs, 4*300]
-        trg_type = dec_outs[8]  # [bs, 1, no_eventTypes]
-        arg_type = dec_outs[9]  # [bs, 1, no_argTypes]
+        # trig_s = dec_outs[1]  # [bs, 1, max_src_len]
+        # trig_e = dec_outs[2]  # [bs, 1, max_src_len]
+        # ent_s = dec_outs[3]  # [bs, 1, max_src_len]
+        # ent_e = dec_outs[4]  # [bs, 1, max_src_len]
+        # dec_hid = dec_outs[5]  # ([bs, hid_dim],[bs, hid_dim])
+        # trigger = dec_outs[6]  # [bs, 4*300]
+        # entity = dec_outs[7]  # [bs, 4*300]
+        # trg_type = dec_outs[8]  # [bs, 1, no_eventTypes]
+        # arg_type = dec_outs[9]  # [bs, 1, no_argTypes]
+        trig_s = dec_outs[0]  # [bs, 1, max_src_len]
+        trig_e = dec_outs[1]  # [bs, 1, max_src_len]
+        ent_s = dec_outs[2]  # [bs, 1, max_src_len]
+        ent_e = dec_outs[3]  # [bs, 1, max_src_len]
+        dec_hid = dec_outs[4]  # ([bs, hid_dim],[bs, hid_dim])
+        trigger = dec_outs[5]  # [bs, 4*300]
+        entity = dec_outs[6]  # [bs, 4*300]
+        trg_type = dec_outs[7]  # [bs, 1, no_eventTypes]
+        arg_type = dec_outs[8]  # [bs, 1, no_argTypes]
 
         topv, topi = rel[:, :, 1:].topk(1)
         topi = torch.add(topi, 1)
@@ -1255,15 +1266,24 @@ class Seq2SeqModel(nn.Module):
                                         is_training)
 
             # cur_rel = dec_outs[0]
-            cur_trig_s = dec_outs[1]
-            cur_trig_e = dec_outs[2]
-            cur_ent_s = dec_outs[3]
-            cur_ent_e = dec_outs[4]
-            dec_hid = dec_outs[5]
-            trigger = dec_outs[6]
-            entity = dec_outs[7]
-            cur_trg_type = dec_outs[8]
-            cur_arg_type = dec_outs[9]
+            # cur_trig_s = dec_outs[1]
+            # cur_trig_e = dec_outs[2]
+            # cur_ent_s = dec_outs[3]
+            # cur_ent_e = dec_outs[4]
+            # dec_hid = dec_outs[5]
+            # trigger = dec_outs[6]
+            # entity = dec_outs[7]
+            # cur_trg_type = dec_outs[8]
+            # cur_arg_type = dec_outs[9]
+            cur_trig_s = dec_outs[0]
+            cur_trig_e = dec_outs[1]
+            cur_ent_s = dec_outs[2]
+            cur_ent_e = dec_outs[3]
+            dec_hid = dec_outs[4]
+            trigger = dec_outs[5]
+            entity = dec_outs[6]
+            cur_trg_type = dec_outs[7]
+            cur_arg_type = dec_outs[8]
 
             # rel = torch.cat((rel, cur_rel), 1)
             trig_s = torch.cat((trig_s, cur_trig_s), 1)
@@ -1392,19 +1412,27 @@ def predict(samples, model, model_id):
                                 max_trg_len, None, None, False)
 
         #NEED INDEX CHANGE DELETE RELATIONS
-        rel += list(outputs[0].data.cpu().numpy())
-        arg1s += list(outputs[1].data.cpu().numpy())
-        arg1e += list(outputs[2].data.cpu().numpy())
-        arg2s += list(outputs[3].data.cpu().numpy())
-        arg2e += list(outputs[4].data.cpu().numpy())
-        eType += list(outputs[5].data.cpu().numpy())
-        argType += list(outputs[6].data.cpu().numpy())
+        # rel += list(outputs[0].data.cpu().numpy())
+        # arg1s += list(outputs[1].data.cpu().numpy())
+        # arg1e += list(outputs[2].data.cpu().numpy())
+        # arg2s += list(outputs[3].data.cpu().numpy())
+        # arg2e += list(outputs[4].data.cpu().numpy())
+        # eType += list(outputs[5].data.cpu().numpy())
+        # argType += list(outputs[6].data.cpu().numpy())
+        # model.zero_grad()
+        arg1s += list(outputs[0].data.cpu().numpy())
+        arg1e += list(outputs[1].data.cpu().numpy())
+        arg2s += list(outputs[2].data.cpu().numpy())
+        arg2e += list(outputs[3].data.cpu().numpy())
+        eType += list(outputs[4].data.cpu().numpy())
+        argType += list(outputs[5].data.cpu().numpy())
         model.zero_grad()
 
     end_time = datetime.datetime.now()
     #print('Prediction time:', end_time - start_time)
     custom_print('Prediction time:', end_time - start_time)
-    return rel, arg1s, arg1e, arg2s, arg2e, eType, argType
+    # return rel, arg1s, arg1e, arg2s, arg2e, eType, argType
+    return arg1s, arg1e, arg2s, arg2e, eType, argType
 
 
 def train_model(model_id, train_samples, dev_samples, best_model_file):
@@ -1513,8 +1541,8 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
                 'long'))  # [0,0,3,4,5,0,0,12,2,3,4,0,0,....]
             et_seq = torch.from_numpy(cur_samples_input['event'])
             arg_seq = torch.from_numpy(cur_samples_input['arg'])
-            rel = torch.from_numpy(cur_samples_input['rel'].astype(
-                'long'))  # same as trg_words_seq
+            # rel = torch.from_numpy(cur_samples_input['rel'].astype(
+            #     'long'))  # same as trg_words_seq
             trigger_s = torch.from_numpy(
                 cur_samples_input['trigger_start'].astype('long'))  # [3,3,7,-1,-1,-1,..]
             trigger_e = torch.from_numpy(
@@ -1539,7 +1567,7 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
                 #adj = adj.cuda()
                 positional_seq = positional_seq.cuda()
 
-                rel = rel.cuda()
+                # rel = rel.cuda()
                 et_seq = et_seq.cuda()
                 arg_seq = arg_seq.cuda()
 
@@ -1560,7 +1588,7 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
             #adj = autograd.Variable(adj)
             positional_seq = autograd.Variable(positional_seq)
 
-            rel = autograd.Variable(rel)
+            # rel = autograd.Variable(rel)
             et_seq = autograd.Variable(et_seq)
             arg_seq = autograd.Variable(arg_seq)
             trigger_s = autograd.Variable(trigger_s)
@@ -1580,10 +1608,12 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
 
             # if model_id == 1:
 
+            # outputs = model(src_words_seq, bert_words_mask, src_pos_tags, src_words_mask, src_chars_seq,
+            #                 positional_seq, trg_words_seq, rel.size()[1], trigger_mask, entity_mask, True)  # call seq2seqmodel()
             outputs = model(src_words_seq, bert_words_mask, src_pos_tags, src_words_mask, src_chars_seq,
-                            positional_seq, trg_words_seq, rel.size()[1], trigger_mask, entity_mask, True)  # call seq2seqmodel()
+                            positional_seq, trg_words_seq, trigger_s.size()[1], trigger_mask, entity_mask, True)  # call seq2seqmodel()
 
-            rel = rel.view(-1, 1).squeeze()
+            #rel = rel.view(-1, 1).squeeze()
             arg1s = trigger_s.view(-1, 1).squeeze()
             arg1e = trigger_e.view(-1, 1).squeeze()
             arg2s = entity_s.view(-1, 1).squeeze()
@@ -1594,8 +1624,8 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
             # loss = rel_criterion(outputs[0], rel) + eType_criterion(outputs[5], et_seq) + aType_criterion(outputs[6], arg_seq) + wf * (pointer_criterion(
             #     outputs[1], arg1s) + pointer_criterion(outputs[2], arg1e)) + wf * (pointer_criterion(outputs[3], arg2s) + pointer_criterion(outputs[4], arg2e))
 
-            loss = eType_criterion(outputs[5], et_seq) + aType_criterion(outputs[6], arg_seq) + wf * (pointer_criterion(
-                outputs[1], arg1s) + pointer_criterion(outputs[2], arg1e)) + wf * (pointer_criterion(outputs[3], arg2s) + pointer_criterion(outputs[4], arg2e))
+            loss = eType_criterion(outputs[4], et_seq) + aType_criterion(outputs[5], arg_seq) + wf * (pointer_criterion(
+                outputs[0], arg1s) + pointer_criterion(outputs[1], arg1e)) + wf * (pointer_criterion(outputs[2], arg2s) + pointer_criterion(outputs[3], arg2e))
             
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 10.0)
@@ -1618,14 +1648,14 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
 
         dev_preds = predict(dev_samples, model, model_id)  # call predict()
 
-        pred_pos, gt_pos, correct_pos = get_F1(dev_samples, dev_preds)
-        #print(pred_pos, '\t', gt_pos, '\t', correct_pos)
-        custom_print(pred_pos, '\t', gt_pos, '\t', correct_pos)
-        p = float(correct_pos) / (pred_pos + 1e-8)
-        r = float(correct_pos) / (gt_pos + 1e-8)
-        dev_acc = (2 * p * r) / (p + r + 1e-8)
-        #print('F1:', dev_acc)
-        custom_print('F1:', dev_acc)
+        # pred_pos, gt_pos, correct_pos = get_F1(dev_samples, dev_preds)
+        # #print(pred_pos, '\t', gt_pos, '\t', correct_pos)
+        # custom_print(pred_pos, '\t', gt_pos, '\t', correct_pos)
+        # p = float(correct_pos) / (pred_pos + 1e-8)
+        # r = float(correct_pos) / (gt_pos + 1e-8)
+        # dev_acc = (2 * p * r) / (p + r + 1e-8)
+        # #print('F1:', dev_acc)
+        # custom_print('F1:', dev_acc)
 
         if dev_acc >= best_dev_acc:
             best_epoch_idx = epoch_idx + 1
@@ -1662,7 +1692,8 @@ logger = open('training.log', 'w+')
 
 bert_base_size = 768
 update_bert = 0
-bert_model_name = 'bert-base-cased'
+# bert_model_name = 'bert-base-cased'
+bert_model_name = 'bert-base-multilingual-cased'
 bert_tokenizer = BertTokenizer.from_pretrained(
     bert_model_name, do_basic_tokenize=False)
 
@@ -1683,7 +1714,8 @@ positional_embed_dim = word_embed_dim
 #max_positional_idx = 100
 max_positional_idx = 140
 
-enc_inp_size = bert_base_size + pos_embed_dim + char_feature_size
+# enc_inp_size = bert_base_size + pos_embed_dim + char_feature_size
+enc_inp_size = bert_base_size
 enc_hidden_size = word_embed_dim
 dec_inp_size = enc_hidden_size
 dec_hidden_size = dec_inp_size
@@ -1726,13 +1758,15 @@ src_dev_file = '../data/valid_bengali.sent'
 trg_dev_file = '../data/valid_bengali.pointer'
 # pos_dev_file = '../data/valid_bengali.tuple'
 # call read_data() for dev_set
-dev_data = read_data(src_dev_file, trg_dev_file, pos_dev_file, 2)
+# dev_data = read_data(src_dev_file, trg_dev_file, pos_dev_file, 2)
+dev_data = read_data(src_dev_file, trg_dev_file, None, 2)
 
 src_test_file = '../data/test_bengali.sent'
 trg_test_file = '../data/test_bengali.pointer'
 # pos_test_file = '../data/test_bengali.tuple'
 # call read_data() for dev_set
-test_data = read_data(src_test_file, trg_test_file, pos_test_file, 3)
+# test_data = read_data(src_test_file, trg_test_file, pos_test_file, 3)
+test_data = read_data(src_test_file, trg_test_file, None, 3)
 
 custom_print('Training data size:', len(train_data))
 custom_print('Development data size:', len(dev_data))

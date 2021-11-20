@@ -69,6 +69,8 @@ def get_data(src_lines, trg_lines, pos_lines, datatype):
         tuples_in = []
         for part in parts:
             elements = part.strip().split(";")
+            print("elements:")
+            print(elements)
             tuples_in.append((int(elements[0]), int(elements[1]), eventnameToIdx[elements[2]], int(
                 elements[3]), int(elements[4]), argnameToIdx[elements[5]]))
 
@@ -1742,11 +1744,6 @@ eventnameToIdx, eventIdxToName = get_events(
     event_file)  # return event dictionary
 arg_file = '../data/processed/arg.txt'
 argnameToIdx, argIdxToName = get_arguments(arg_file)  # return arg dictionary
-
-print("argnametoidx:")
-print(argnameToIdx)
-print("argidxtoname:")
-print(argIdxToName)
 
 custom_print(max_src_len, '\t', max_trg_len, '\t', drop_rate)
 custom_print(batch_size, '\t', num_epoch)

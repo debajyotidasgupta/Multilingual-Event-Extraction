@@ -1473,7 +1473,7 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
     #print('Parameters size:', pytorch_total_params)
     custom_print('Parameters size:', pytorch_total_params)
     # print(model)
-    custom_print(model)
+    #custom_print(model)
     if torch.cuda.is_available():
         model.cuda()
     if n_gpu > 1:

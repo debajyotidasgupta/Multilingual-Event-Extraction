@@ -786,8 +786,8 @@ def get_batch_data(cur_samples, is_training=False):
             # list of all the relation index(from rel_vocab) padded with 'None' and '<Pad>'
             # decoder_input_list.append(get_relation_index_seq(
             #     sample.TrgRels, batch_trg_max_len))
-            decoder_input_list.append(np.array(get_padded_events(
-                sample.eventTypes, batch_trg_max_len)))
+            decoder_input_list.append(get_padded_events(
+                sample.eventTypes, batch_trg_max_len))
 
             # list of length max_trg_len where each item is a list of size max_src_len. Each item of that list is mask where all but start and end index of entity_1 (and entity_2) set to 1 (respectively).
             trigger_mask, entity_mask = get_entity_masks(

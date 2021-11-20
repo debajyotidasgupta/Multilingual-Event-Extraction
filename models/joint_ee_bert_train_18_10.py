@@ -493,6 +493,7 @@ def get_max_len(sample_batch):
 
     trg_max_len = len(sample_batch[0].eventTypes)
     for idx in range(1, len(sample_batch)):
+        assert len(sample_batch[idx].eventTypes)==len(sample_batch[idx].TrgPointers)
         if len(sample_batch[idx].eventTypes) > trg_max_len:
             trg_max_len = len(sample_batch[idx].eventTypes)
 

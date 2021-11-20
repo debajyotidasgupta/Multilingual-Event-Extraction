@@ -69,8 +69,6 @@ def get_data(src_lines, trg_lines, pos_lines, datatype):
         tuples_in = []
         for part in parts:
             elements = part.strip().split(";")
-            print("elements:")
-            print(elements)
             tuples_in.append((int(elements[0]), int(elements[1]), eventnameToIdx[elements[2]], int(
                 elements[3]), int(elements[4]), argnameToIdx[elements[5]]))
 

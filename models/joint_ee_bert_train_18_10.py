@@ -941,7 +941,7 @@ class Encoder(nn.Module):
             self.gcn = GCN(gcn_num_layers, 2 * self.hidden_dim, 2 * self.hidden_dim)
         '''
 
-        # self.dropout = nn.Dropout(self.drop_rate)
+        self.dropout = nn.Dropout(self.drop_rate)
         # self.conv1d = nn.Conv1d(
         #     char_embed_dim, char_feature_size, conv_filter_size)
         # self.max_pool = nn.MaxPool1d(

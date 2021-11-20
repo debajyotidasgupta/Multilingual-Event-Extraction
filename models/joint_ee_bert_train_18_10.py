@@ -46,7 +46,6 @@ def custom_print(*msg):
 def get_data(src_lines, trg_lines, pos_lines, datatype):
     samples = []
     uid = 1
-    cunt = 0
     for i in range(0, len(src_lines)):  # for each line
         src_line = src_lines[i].strip()
         trg_line = trg_lines[i].strip()
@@ -91,7 +90,6 @@ def get_data(src_lines, trg_lines, pos_lines, datatype):
         if datatype == 1 and (len(src_words) > max_src_len):
             # print(src_line)
             # print(trg_line)
-            cunt+=1
             continue
 
         # sample = Sample(Id=uid, SrcLen=len(src_words), SrcWords=src_words, PosTags=word_pos_tags, TrgLen=len(trg_rels), TrgRels=trg_rels,
@@ -101,7 +99,6 @@ def get_data(src_lines, trg_lines, pos_lines, datatype):
         
         samples.append(sample)
         uid += 1
-    print("cunt:",cunt)
     return samples
 
 
@@ -732,13 +729,13 @@ def get_batch_data(cur_samples, is_training=False):
     positional_index_list = []
     src_pos_tag_seq = []
 
-    rel_seq = list()
-    event_seq = list()  # ******
-    arg_seq = list()  # ********
-    trigger_start_seq = list()
-    trigger_end_seq = list()
-    entity_start_seq = list()
-    entity_end_seq = list()
+    rel_seq = []
+    event_seq = []  # ******
+    arg_seq = []  # ********
+    trigger_start_seq = []
+    trigger_end_seq = []
+    entity_start_seq = []
+    entity_end_seq = []
     trigger_mask_seq = []
     entity_mask_seq = []
     '''all commmnets in the following are about the 'items' appended to that respective lists'''

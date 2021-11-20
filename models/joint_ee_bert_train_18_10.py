@@ -1745,6 +1745,8 @@ argnameToIdx, argIdxToName = get_arguments(arg_file)  # return arg dictionary
 
 print("argnametoidx:")
 print(argnameToIdx)
+print("argidxtoname:")
+print(argIdxToName)
 
 custom_print(max_src_len, '\t', max_trg_len, '\t', drop_rate)
 custom_print(batch_size, '\t', num_epoch)

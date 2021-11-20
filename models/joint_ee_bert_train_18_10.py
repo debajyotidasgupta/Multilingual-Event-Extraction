@@ -707,16 +707,27 @@ def get_batch_data(cur_samples, is_training=False):
     batch_trg_max_len += 1  # may be EOS relation
     # print('max_src_len_batch={}'.format(batch_src_max_len))
     # print('max_trg_len_batch={}'.format(batch_trg_max_len))
-    src_words_list = list()  # each element is a list of word indices present in a sentence
-    bert_mask_list = list()
+    # src_words_list = list()  # each element is a list of word indices present in a sentence
+    # bert_mask_list = list()
+    # # each element is a list of mask value, 0 if actual word and 1 if padded word
+    # src_words_mask_list = list()
+    # src_char_seq = list()  # each element is a charater idex sequence per sentence
+    # decoder_input_list = list()
+    # #adj_lst = []
+    # # each element is a sequence of positional index of the words in a sentence
+    # positional_index_list = []
+    # src_pos_tag_seq = list()
+
+    src_words_list = []  # each element is a list of word indices present in a sentence
+    bert_mask_list = []
     # each element is a list of mask value, 0 if actual word and 1 if padded word
-    src_words_mask_list = list()
-    src_char_seq = list()  # each element is a charater idex sequence per sentence
-    decoder_input_list = list()
+    src_words_mask_list = []
+    src_char_seq = []  # each element is a charater idex sequence per sentence
+    decoder_input_list = []
     #adj_lst = []
     # each element is a sequence of positional index of the words in a sentence
     positional_index_list = []
-    src_pos_tag_seq = list()
+    src_pos_tag_seq = []
 
     rel_seq = list()
     event_seq = list()  # ******
@@ -1532,9 +1543,9 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
             }
             '''
 
-            print("cur sample positional seq")
-            print(cur_samples_input['positional_seq'])
-            print(len(cur_samples_input['positional_seq']))
+            # print("cur sample positional seq")
+            # print(cur_samples_input['positional_seq'])
+            # print(len(cur_samples_input['positional_seq']))
 
             src_words_seq = torch.from_numpy(
                 cur_samples_input['src_words'].astype('long'))  # [23,45,1,56,78,..,0,0,..]

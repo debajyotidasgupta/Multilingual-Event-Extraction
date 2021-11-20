@@ -39,7 +39,7 @@ def custom_print(*msg):
             logger.write(str(msg[i]) + '\n')
         else:
             # print(msg[i], ' ', end='')
-            print(msg[i],  end='')
+            print(msg[i],sep=" " ,end="")
             logger.write(str(msg[i]))
 
 

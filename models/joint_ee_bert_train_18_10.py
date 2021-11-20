@@ -491,10 +491,11 @@ def get_max_len(sample_batch):
         if len(sample_batch[idx].SrcWords) > src_max_len:
             src_max_len = len(sample_batch[idx].SrcWords)
 
-    trg_max_len = len(sample_batch[0].TrgRels)
-    for idx in range(1, len(sample_batch)):
-        if len(sample_batch[idx].TrgRels) > trg_max_len:
-            trg_max_len = len(sample_batch[idx].TrgRels)
+    # trg_max_len = len(sample_batch[0].TrgRels)
+    # for idx in range(1, len(sample_batch)):
+    #     if len(sample_batch[idx].TrgRels) > trg_max_len:
+    #         trg_max_len = len(sample_batch[idx].TrgRels)
+    trg_max_len = len(sample_batch[idx].TrgPointers)
 
     return src_max_len, trg_max_len
 

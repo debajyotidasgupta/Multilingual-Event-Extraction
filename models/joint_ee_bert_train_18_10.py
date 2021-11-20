@@ -1543,20 +1543,6 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
             }
             '''
 
-            # print("cur sample positional seq")
-            # print(cur_samples_input['positional_seq'])
-            # print(len(cur_samples_input['positional_seq']))
-
-            # print("cur sample decoder input")
-            # print(cur_samples_input['decoder_input'])
-            # print(len(cur_samples_input['decoder_input']))
-            # print("PAKISTAN")
-
-            print(type(cur_samples_input['positional_seq']))
-            print(type(cur_samples_input['decoder_input']))
-            print(type(cur_samples_input['positional_seq'][0]))
-            print(type(cur_samples_input['decoder_input'][0]))
-
             src_words_seq = torch.from_numpy(
                 cur_samples_input['src_words'].astype('long'))  # [23,45,1,56,78,..,0,0,..]
             bert_words_mask = torch.from_numpy(
@@ -1803,6 +1789,8 @@ test_data = read_data(src_test_file, trg_test_file, None, 3)
 
 custom_print('Training data size:', len(train_data))
 custom_print('Development data size:', len(dev_data))
+print("India:",len(train_data[0]))
+print("China:",len(dev_data[0]))
 
 custom_print("preparing vocabulary......")
 

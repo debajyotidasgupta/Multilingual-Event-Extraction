@@ -1553,6 +1553,8 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
                 cur_samples_input['positional_seq'].astype('long'))  # [1,2,3,4,..,0,0,...]
             src_words_mask = torch.from_numpy(
                 cur_samples_input['src_words_mask'].astype('bool'))  # [0,0,0,0,0,1,1,1,..]
+            print("India:",type(cur_samples_input['decoder_input']))
+            print("China:",type(cur_samples_input['decoder_input'][0]))
             trg_words_seq = torch.from_numpy(cur_samples_input['decoder_input'].astype(
                 'long'))  # [2,5,1,6,id('none'),id(pad),id(pad),..]
             src_chars_seq = torch.from_numpy(cur_samples_input['src_chars'].astype(

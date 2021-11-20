@@ -1187,9 +1187,9 @@ class Seq2SeqModel(nn.Module):
     def forward(self, src_words_seq, bert_mask, pos_tag_seq, src_mask, src_char_seq, pos_seq, trg_words_seq, trg_rel_cnt,
                 trigger_mask, entity_mask, is_training=False):
         # custom_print('src_word_seq = {}'.format(src_words_seq.shape))#[32, max_seq_len]
-        if is_training:
-            trg_word_embeds = self.dropout(
-                self.relation_embeddings(trg_words_seq))
+        # if is_training:
+        #     trg_word_embeds = self.dropout(
+        #         self.relation_embeddings(trg_words_seq))
         # custom_print('src_word_seq = {}'.format(src_words_seq.shape))#[32, max_seq_len]
         batch_len = src_words_seq.size()[0]  # batch_size
         # custom_print('batch_size={}'.format(batch_len))
@@ -1220,7 +1220,8 @@ class Seq2SeqModel(nn.Module):
         entity = autograd.Variable(torch.FloatTensor(torch.zeros(
             batch_len, 4 * dec_hidden_size))).cuda()  # [bs, 4*300]
 
-        prev_tuples = torch.cat((trigger, entity, dec_inp), -1)  # [bs, 9*300]
+        # prev_tuples = torch.cat((trigger, entity, dec_inp), -1)  # [bs, 9*300]
+        prev_tuples = torch.cat((trigger, entity), -1)  # [bs, 9*300]
         #custom_print('start decoding.....')
         if is_training:
             dec_outs = self.decoder(dec_inp, prev_tuples, dec_hid, enc_hs, src_mask, trigger, entity,
@@ -1248,22 +1249,26 @@ class Seq2SeqModel(nn.Module):
         trg_type = dec_outs[7]  # [bs, 1, no_eventTypes]
         arg_type = dec_outs[8]  # [bs, 1, no_argTypes]
 
-        topv, topi = rel[:, :, 1:].topk(1)
-        topi = torch.add(topi, 1)
+        #topv, topi = rel[:, :, 1:].topk(1)
+        #topi = torch.add(topi, 1)
         #custom_print('decoding continue...')
         for t in range(1, time_steps):
             #custom_print('time step: {}'.format(t))
             if is_training:
-                dec_inp = trg_word_embeds[:, t - 1, :].squeeze()  # [bs, 300]
+                #dec_inp = trg_word_embeds[:, t - 1, :].squeeze()  # [bs, 300]
+                # prev_tuples = torch.cat(
+                #     (trigger, entity, dec_inp), -1) + prev_tuples  # [bs, 9*300]
                 prev_tuples = torch.cat(
-                    (trigger, entity, dec_inp), -1) + prev_tuples  # [bs, 9*300]
+                    (trigger, entity), -1) + prev_tuples  # [bs, 9*300]
                 dec_outs = self.decoder(dec_inp, prev_tuples, dec_hid, enc_hs, src_mask, trigger, entity,
                                         trigger_mask[:, t, :].squeeze(), entity_mask[:, t, :].squeeze(), is_training)
             else:
-                dec_inp = self.relation_embeddings(
-                    topi.squeeze().detach()).squeeze()
+                # dec_inp = self.relation_embeddings(
+                #     topi.squeeze().detach()).squeeze()
+                # prev_tuples = torch.cat(
+                #     (trigger, entity, dec_inp), -1) + prev_tuples
                 prev_tuples = torch.cat(
-                    (trigger, entity, dec_inp), -1) + prev_tuples
+                    (trigger, entity), -1) + prev_tuples
                 dec_outs = self.decoder(dec_inp, prev_tuples, dec_hid, enc_hs, src_mask, trigger, entity, None, None,
                                         is_training)
 

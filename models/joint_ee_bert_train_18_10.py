@@ -787,8 +787,8 @@ def get_batch_data(cur_samples, is_training=False):
             #     sample.TrgRels, batch_trg_max_len))
             decoder_input_list.append(get_padded_events(
                 sample.eventTypes, batch_trg_max_len))
-            print("batch trg max len=",batch_trg_max_len)
-            print("this length=",len(get_padded_events(sample.eventTypes,batch_trg_max_len)))
+            # print("batch trg max len=",batch_trg_max_len)
+            # print("this length=",len(get_padded_events(sample.eventTypes,batch_trg_max_len)))
 
             # list of length max_trg_len where each item is a list of size max_src_len. Each item of that list is mask where all but start and end index of entity_1 (and entity_2) set to 1 (respectively).
             trigger_mask, entity_mask = get_entity_masks(
@@ -1560,8 +1560,8 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
                 'long'))  # [0,0,3,4,5,0,0,12,2,3,4,0,0,....]
             # rel = torch.from_numpy(cur_samples_input['rel'].astype(
             #     'long'))  # same as trg_words_seq
-            et_seq = torch.from_numpy(cur_samples_input['event']).astype('long')
-            arg_seq = torch.from_numpy(cur_samples_input['arg']).astype('long')
+            et_seq = torch.from_numpy(cur_samples_input['event'].astype('long'))
+            arg_seq = torch.from_numpy(cur_samples_input['arg'].astype('long'))
             trigger_s = torch.from_numpy(
                 cur_samples_input['trigger_start'].astype('long'))  # [3,3,7,-1,-1,-1,..]
             trigger_e = torch.from_numpy(

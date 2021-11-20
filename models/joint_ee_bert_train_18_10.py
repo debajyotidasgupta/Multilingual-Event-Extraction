@@ -1001,11 +1001,11 @@ class Decoder(nn.Module):
             self.attention = Attention(input_dim)
             self.lstm = nn.LSTMCell(10 * self.input_dim, self.hidden_dim)
         elif att_type == 1:
-            # self.w = nn.Linear(9 * self.input_dim, self.input_dim)
+            self.w = nn.Linear(8 * self.input_dim, self.input_dim)
             self.attention = Attention(input_dim)
             self.lstm = nn.LSTMCell(10 * self.input_dim, self.hidden_dim)
         else:
-            # self.w = nn.Linear(9 * self.input_dim, self.input_dim)
+            self.w = nn.Linear(8 * self.input_dim, self.input_dim)
             self.attention1 = Attention(input_dim)
             self.attention2 = Attention(input_dim)
             self.lstm = nn.LSTMCell(11 * self.input_dim, self.hidden_dim)
@@ -1195,6 +1195,9 @@ class Seq2SeqModel(nn.Module):
         #     len(relnameToIdx), word_embed_dim)
         # self.w = nn.Linear(10 * dec_inp_size, dec_inp_size)
         self.dropout = nn.Dropout(drop_rate)
+    
+    # model(src_words_seq, bert_words_mask, src_pos_tags, src_words_mask, src_chars_seq,
+    #                         positional_seq, trg_words_seq, trigger_s.size()[1], trigger_mask, entity_mask, True)  # call seq2seqmodel()
 
     def forward(self, src_words_seq, bert_mask, pos_tag_seq, src_mask, src_char_seq, pos_seq, trg_words_seq, trg_rel_cnt,
                 trigger_mask, entity_mask, is_training=False):

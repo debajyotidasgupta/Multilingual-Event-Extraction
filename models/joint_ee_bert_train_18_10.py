@@ -85,7 +85,6 @@ def get_data(src_lines, trg_lines, pos_lines, datatype):
             # all the records like event-start_index, end_index, entity- start_index, end_index
             trg_pointers.append((int(elements[0]), int(
                 elements[1]), int(elements[3]), int(elements[4])))
-            print("Pakistan:"+elements[2])
 
         # if cross max_sentence_length or max_trg_length(max no of relation tuples present in the sentence)
         if datatype == 1 and (len(src_words) > max_src_len):
@@ -1561,6 +1560,8 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
                 'long'))  # [0,0,3,4,5,0,0,12,2,3,4,0,0,....]
             # rel = torch.from_numpy(cur_samples_input['rel'].astype(
             #     'long'))  # same as trg_words_seq
+            et_seq = torch.from_numpy(cur_samples_input['event']).astype('long')
+            arg_seq = torch.from_numpy(cur_samples_input['arg']).astype('long')
             trigger_s = torch.from_numpy(
                 cur_samples_input['trigger_start'].astype('long'))  # [3,3,7,-1,-1,-1,..]
             trigger_e = torch.from_numpy(

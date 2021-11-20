@@ -796,7 +796,7 @@ def get_batch_data(cur_samples, is_training=False):
             'src_words_mask': np.array(src_words_mask_list),
             # list of source character sequences with padding for CNN operation
             'src_chars': np.array(src_char_seq),
-            # list of all the relation indexes present in the trg_seq padded till amx_trg_len(for training), [] for testing
+            # list of all the relation indexes present in the trg_seq padded till max_trg_len(for training), [] for testing
             'decoder_input': np.array(decoder_input_list),
             'event': np.array(event_seq),
             'arg': np.array(arg_seq),
@@ -1532,9 +1532,9 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
             }
             '''
 
-            print("cur sample input decoder input")
-            print(cur_samples_input['decoder_input'])
-            print(len(cur_samples_input))
+            print("cur sample positional seq")
+            print(cur_samples_input['positional_seq'])
+            print(len(positional_seq))
 
             src_words_seq = torch.from_numpy(
                 cur_samples_input['src_words'].astype('long'))  # [23,45,1,56,78,..,0,0,..]

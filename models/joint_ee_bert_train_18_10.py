@@ -46,6 +46,7 @@ def custom_print(*msg):
 def get_data(src_lines, trg_lines, pos_lines, datatype):
     samples = []
     uid = 1
+    cunt = 0
     for i in range(0, len(src_lines)):  # for each line
         src_line = src_lines[i].strip()
         trg_line = trg_lines[i].strip()
@@ -90,6 +91,7 @@ def get_data(src_lines, trg_lines, pos_lines, datatype):
         if datatype == 1 and (len(src_words) > max_src_len):
             # print(src_line)
             # print(trg_line)
+            cunt+=1
             continue
 
         # sample = Sample(Id=uid, SrcLen=len(src_words), SrcWords=src_words, PosTags=word_pos_tags, TrgLen=len(trg_rels), TrgRels=trg_rels,
@@ -99,6 +101,7 @@ def get_data(src_lines, trg_lines, pos_lines, datatype):
         
         samples.append(sample)
         uid += 1
+    print("cunt:",cunt)
     return samples
 
 
@@ -1789,8 +1792,6 @@ test_data = read_data(src_test_file, trg_test_file, None, 3)
 
 custom_print('Training data size:', len(train_data))
 custom_print('Development data size:', len(dev_data))
-print("India:",type(train_data[0]))
-print("China:",type(dev_data[0]))
 
 custom_print("preparing vocabulary......")
 

@@ -1533,7 +1533,7 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
             '''
 
             print("cur sample input")
-            print(cur_sample_input)
+            print(cur_samples_input)
 
             src_words_seq = torch.from_numpy(
                 cur_samples_input['src_words'].astype('long'))  # [23,45,1,56,78,..,0,0,..]

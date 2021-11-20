@@ -85,6 +85,7 @@ def get_data(src_lines, trg_lines, pos_lines, datatype):
             # all the records like event-start_index, end_index, entity- start_index, end_index
             trg_pointers.append((int(elements[0]), int(
                 elements[1]), int(elements[3]), int(elements[4])))
+            print("Pakistan:"+elements[2])
 
         # if cross max_sentence_length or max_trg_length(max no of relation tuples present in the sentence)
         if datatype == 1 and (len(src_words) > max_src_len):
@@ -493,7 +494,6 @@ def get_max_len(sample_batch):
 
     trg_max_len = len(sample_batch[0].eventTypes)
     for idx in range(1, len(sample_batch)):
-        assert len(sample_batch[idx].eventTypes)==len(sample_batch[idx].TrgPointers)
         if len(sample_batch[idx].eventTypes) > trg_max_len:
             trg_max_len = len(sample_batch[idx].eventTypes)
 
@@ -1555,9 +1555,6 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
                 cur_samples_input['positional_seq'].astype('long'))  # [1,2,3,4,..,0,0,...]
             src_words_mask = torch.from_numpy(
                 cur_samples_input['src_words_mask'].astype('bool'))  # [0,0,0,0,0,1,1,1,..]
-            print("India:",type(cur_samples_input['decoder_input']))
-            print(cur_samples_input['decoder_input'])
-            print("China:",type(cur_samples_input['decoder_input'][0]))
             trg_words_seq = torch.from_numpy(cur_samples_input['decoder_input'].astype(
                 'long'))  # [2,5,1,6,id('none'),id(pad),id(pad),..]
             src_chars_seq = torch.from_numpy(cur_samples_input['src_chars'].astype(

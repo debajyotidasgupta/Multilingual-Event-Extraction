@@ -1789,8 +1789,8 @@ test_data = read_data(src_test_file, trg_test_file, None, 3)
 
 custom_print('Training data size:', len(train_data))
 custom_print('Development data size:', len(dev_data))
-print("India:",len(train_data[0]))
-print("China:",len(dev_data[0]))
+print("India:",type(train_data[0]))
+print("China:",type(dev_data[0]))
 
 custom_print("preparing vocabulary......")
 

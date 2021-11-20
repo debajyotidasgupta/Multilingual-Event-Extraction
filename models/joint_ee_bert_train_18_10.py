@@ -1733,13 +1733,14 @@ early_stop_cnt = 7
 #     "Sample", "Id SrcLen SrcWords PosTags TrgLen TrgRels eventTypes argTypes TrgPointers")
 Sample = recordclass(
     "Sample", "Id SrcLen SrcWords TrgLen eventTypes argTypes TrgPointers")
-rel_file = './joint_ee/role.txt'
+# rel_file = './joint_ee/role.txt'
+rel_file = '../data/processed/role.txt'
 # relnameToIdx, relIdxToName = get_relations(
 #     rel_file)  # return relation dictionary
-event_file = './joint_ee/event_type.txt'
+event_file = '../data/processed/event.txt'
 eventnameToIdx, eventIdxToName = get_events(
     event_file)  # return event dictionary
-arg_file = './joint_ee/ent_type.txt'
+arg_file = '../data/processed/arg.txt'
 argnameToIdx, argIdxToName = get_arguments(arg_file)  # return arg dictionary
 
 custom_print(max_src_len, '\t', max_trg_len, '\t', drop_rate)
@@ -1747,23 +1748,23 @@ custom_print(batch_size, '\t', num_epoch)
 custom_print(enc_type)
 custom_print('loading data......')
 
-src_train_file = '../data/train_bengali.sent'
-trg_train_file = '../data/train_bengali.pointer'
+src_train_file = '../data/processed/train_bengali.sent'
+trg_train_file = '../data/processed/train_bengali.pointer'
 # pos_train_file = '../data/train_bengali.tuple'
 
 # call read_data() for train_set
 # train_data = read_data(src_train_file, trg_train_file, pos_train_file, 1)
 train_data = read_data(src_train_file, trg_train_file, None, 1)
 
-src_dev_file = '../data/valid_bengali.sent'
-trg_dev_file = '../data/valid_bengali.pointer'
+src_dev_file = '../data/processed/valid_bengali.sent'
+trg_dev_file = '../data/processed/valid_bengali.pointer'
 # pos_dev_file = '../data/valid_bengali.tuple'
 # call read_data() for dev_set
 # dev_data = read_data(src_dev_file, trg_dev_file, pos_dev_file, 2)
 dev_data = read_data(src_dev_file, trg_dev_file, None, 2)
 
-src_test_file = '../data/test_bengali.sent'
-trg_test_file = '../data/test_bengali.pointer'
+src_test_file = '../data/processed/test_bengali.sent'
+trg_test_file = '../data/processed/test_bengali.pointer'
 # pos_test_file = '../data/test_bengali.tuple'
 # call read_data() for dev_set
 # test_data = read_data(src_test_file, trg_test_file, pos_test_file, 3)

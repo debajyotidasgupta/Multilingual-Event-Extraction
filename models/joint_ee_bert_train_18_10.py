@@ -973,6 +973,7 @@ class Decoder(nn.Module):
         self.layers = layers
         self.drop_rate = drop_out_rate
         self.max_length = max_length
+        
 
         if att_type == 0:
             self.attention = Attention(input_dim)

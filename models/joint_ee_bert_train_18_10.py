@@ -909,7 +909,7 @@ class BERT(nn.Module):
     def forward(self, input_ids, bert_mask, is_training=False):
         seq_out = self.bert(input_ids, attention_mask=bert_mask)
         print("china")
-        print(seq_out.shape)
+        print(len(seq_out))
         seq_out = seq_out[0][:, 1:-1, :]
         # seq_out = self.dropout(seq_out)
         return seq_out

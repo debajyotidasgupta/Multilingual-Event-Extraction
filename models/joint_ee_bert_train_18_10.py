@@ -1025,15 +1025,15 @@ class Decoder(nn.Module):
         self.entity_e_lin = nn.Linear(2 * self.input_dim, 1)
 
         # ***************to identify the event type
-        self.et_lin = nn.Linear(8 * self.input_dim, len(eventnameToIdx))
+        self.et_lin = nn.Linear(9 * self.input_dim, len(eventnameToIdx))
         # ***************to identify the argumwnt type
-        self.argt_lin = nn.Linear(8 * self.input_dim, len(argnameToIdx))
+        self.argt_lin = nn.Linear(9 * self.input_dim, len(argnameToIdx))
 
         # to identify the role
         # self.rel_lin = nn.Linear(9 * self.input_dim, len(relnameToIdx))
 
         self.dropout = nn.Dropout(self.drop_rate)
-        self.w = nn.Linear(9 * self.input_dim, self.input_dim)
+        self.w = nn.Linear(8 * self.input_dim, self.input_dim)
 
     def forward(self, y_prev, prev_tuples, h_prev, enc_hs, src_mask, trigger, entity, trigger_mask, entity_mask,
                 is_training=False):

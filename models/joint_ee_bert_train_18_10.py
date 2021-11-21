@@ -1008,7 +1008,7 @@ class Decoder(nn.Module):
             self.w = nn.Linear(8 * self.input_dim, self.input_dim)
             self.attention1 = Attention(input_dim)
             self.attention2 = Attention(input_dim)
-            self.lstm = nn.LSTMCell(11 * self.input_dim, self.hidden_dim)
+            self.lstm = nn.LSTMCell(10 * self.input_dim, self.hidden_dim)
 
         self.trig_pointer_lstm = nn.LSTM(2 * self.input_dim, self.input_dim, 1, batch_first=True,
                                          bidirectional=True)

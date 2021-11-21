@@ -194,7 +194,7 @@ def get_arguments(file_name):
 
 def is_full_match(triplet, triplets):
     for t in triplets:
-        if t[0] == triplet[0] and t[1] == triplet[1] and t[2] == triplet[2] and t[3] == triplet[3] and t[4] == triplet[4]:
+        if t[0] == triplet[0] and t[1] == triplet[1] and t[2] == triplet[2] and t[3] == triplet[3]:
             return True
     return False
 
@@ -205,11 +205,13 @@ def is_full_match(triplet, triplets):
 def get_gt_triples(src_words, rels, pointers, event_list, arg_list):
     touples = []
     i = 0
-    for r in rels:
+    for r in pointers:
         arg1 = ' '.join(src_words[pointers[i][0]:pointers[i][1] + 1])
         arg2 = ' '.join(src_words[pointers[i][2]:pointers[i][3] + 1])
+        # touplet = (arg1.strip(), eventIdxToName[event_list[i]], arg2.strip(
+        # ), argIdxToName[arg_list[i]], relIdxToName[r])
         touplet = (arg1.strip(), eventIdxToName[event_list[i]], arg2.strip(
-        ), argIdxToName[arg_list[i]], relIdxToName[r])
+        ), argIdxToName[arg_list[i]])
         if not is_full_match(touplet, touples):
             touples.append(touplet)
         i += 1
@@ -295,13 +297,13 @@ def get_pred_triples(rel, arg1s, arg1e, arg2s, arg2e, eTypes, aTypes, src_words)
     touples = []
     all_touples = []
 
-    for i in range(0, len(rel)):
+    for i in range(0, len(arg1s)):
 
         s1, e1, s2, e2 = get_answer_pointers(
             arg1s[i], arg1e[i], arg2s[i], arg2e[i], len(src_words))
         if s1 == 0 or e1 == 0:
             break
-        r = np.argmax(rel[i][1:]) + 1
+        # r = np.argmax(rel[i][1:]) + 1
         # event type can not be <pad> or <None>
         ev = np.argmax(eTypes[i][1:]) + 1
         at = np.argmax(aTypes[i][1:]) + 1
@@ -312,8 +314,10 @@ def get_pred_triples(rel, arg1s, arg1e, arg2s, arg2e, eTypes, aTypes, src_words)
         arg2 = arg2.strip()
         if arg1 == arg2:
             continue
+        # touplet = (arg1, eventIdxToName[ev], arg2,
+        #            argIdxToName[at], relIdxToName[r])
         touplet = (arg1, eventIdxToName[ev], arg2,
-                   argIdxToName[at], relIdxToName[r])
+                   argIdxToName[at])
         # same (trigger, argument) pair can not have two different role
         if (touplet[0], touplet[1], touplet[2]) in [(t[0], t[1], t[2]) for t in touples]:
             continue
@@ -354,11 +358,13 @@ def get_F1(data, preds):
         # gt_triples = get_gt_triples(
         #     data[i].SrcWords, data[i].TrgRels, data[i].TrgPointers, data[i].eventTypes, data[i].argTypes)
         gt_triples = get_gt_triples(
-            data[i].SrcWords, data[i].TrgPointers, data[i].eventTypes, data[i].argTypes)
+            data[i].SrcWords, None, data[i].TrgPointers, data[i].eventTypes, data[i].argTypes)
 
         #NEED INDEX CHANGES, 0-RELATIONS
-        pred_triples, all_pred_triples = get_pred_triples(preds[0][i], preds[1][i], preds[2][i], preds[3][i],
-                                                          preds[4][i], preds[5][i], preds[6][i], data[i].SrcWords)
+        # pred_triples, all_pred_triples = get_pred_triples(preds[0][i], preds[1][i], preds[2][i], preds[3][i],
+        #                                                   preds[4][i], preds[5][i], preds[6][i], data[i].SrcWords)
+        pred_triples, all_pred_triples = get_pred_triples(preds[0][i], preds[1][i], preds[2][i],
+                                                          preds[3][i], preds[4][i], preds[5][i], data[i].SrcWords)
         total_pred_pos += len(all_pred_triples)
         gt_pos += len(gt_triples)
         pred_pos += len(pred_triples)
@@ -908,8 +914,8 @@ class BERT(nn.Module):
 
     def forward(self, input_ids, bert_mask, is_training=False):
         seq_out = self.bert(input_ids, attention_mask=bert_mask)
-        print("china")
-        print(len(seq_out))
+        print("china bangla")
+        print(len(seq_out[1]))
         seq_out = seq_out[0][:, 1:-1, :]
         # seq_out = self.dropout(seq_out)
         return seq_out
@@ -1221,8 +1227,6 @@ class Seq2SeqModel(nn.Module):
                               pos_tag_seq, src_char_seq, pos_seq, is_training)
         # custom_print(enc_hs.shape)
         src_time_steps = enc_hs.shape[1]
-        print("pakistan")
-        print(enc_hs.shape)
         # custom_print('max_src_len={}'.format(src_time_steps))
         #custom_print('encoder output dim = {}'.format(enc_hs.shape))
         # custom_print('source_mask={}'.format(src_mask.shape))
@@ -1677,14 +1681,14 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
 
         dev_preds = predict(dev_samples, model, model_id)  # call predict()
 
-        # pred_pos, gt_pos, correct_pos = get_F1(dev_samples, dev_preds)
-        # #print(pred_pos, '\t', gt_pos, '\t', correct_pos)
-        # custom_print(pred_pos, '\t', gt_pos, '\t', correct_pos)
-        # p = float(correct_pos) / (pred_pos + 1e-8)
-        # r = float(correct_pos) / (gt_pos + 1e-8)
-        # dev_acc = (2 * p * r) / (p + r + 1e-8)
-        # #print('F1:', dev_acc)
-        # custom_print('F1:', dev_acc)
+        pred_pos, gt_pos, correct_pos = get_F1(dev_samples, dev_preds)
+        #print(pred_pos, '\t', gt_pos, '\t', correct_pos)
+        custom_print(pred_pos, '\t', gt_pos, '\t', correct_pos)
+        p = float(correct_pos) / (pred_pos + 1e-8)
+        r = float(correct_pos) / (gt_pos + 1e-8)
+        dev_acc = (2 * p * r) / (p + r + 1e-8)
+        #print('F1:', dev_acc)
+        custom_print('F1:', dev_acc)
 
         if dev_acc >= best_dev_acc:
             best_epoch_idx = epoch_idx + 1

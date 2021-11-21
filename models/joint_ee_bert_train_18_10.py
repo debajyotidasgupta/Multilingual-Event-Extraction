@@ -978,11 +978,11 @@ class Decoder(nn.Module):
             self.attention = Attention(input_dim)
             self.lstm = nn.LSTMCell(10 * self.input_dim, self.hidden_dim)
         elif att_type == 1:
-            # self.w = nn.Linear(9 * self.input_dim, self.input_dim)
+            self.w = nn.Linear(8 * self.input_dim, self.input_dim)
             self.attention = Attention(input_dim)
             self.lstm = nn.LSTMCell(10 * self.input_dim, self.hidden_dim)
         else:
-            # self.w = nn.Linear(9 * self.input_dim, self.input_dim)
+            self.w = nn.Linear(8 * self.input_dim, self.input_dim)
             self.attention1 = Attention(input_dim)
             self.attention2 = Attention(input_dim)
             self.lstm = nn.LSTMCell(11 * self.input_dim, self.hidden_dim)

@@ -72,7 +72,7 @@ def get_data(src_lines, trg_lines, pos_lines, datatype):
             tuples_in.append((int(elements[0]), int(elements[1]), eventnameToIdx[elements[2]], int(
                 elements[3]), int(elements[4]), argnameToIdx[elements[5]]))
 
-        if datatype == 1:
+        if datatype == 1 or datatype==2:
             tuples_in = sorted(
                 tuples_in, key=lambda element: (element[0], element[3]))
         for elements in tuples_in:
@@ -87,7 +87,7 @@ def get_data(src_lines, trg_lines, pos_lines, datatype):
                 elements[1]), int(elements[3]), int(elements[4])))
 
         # if cross max_sentence_length or max_trg_length(max no of relation tuples present in the sentence)
-        if datatype == 1 and (len(src_words) > max_src_len):
+        if (datatype == 1 or datatype==2) and (len(src_words) > max_src_len):
             # print(src_line)
             # print(trg_line)
             continue
@@ -908,6 +908,8 @@ class BERT(nn.Module):
 
     def forward(self, input_ids, bert_mask, is_training=False):
         seq_out = self.bert(input_ids, attention_mask=bert_mask)
+        print("china")
+        print(seq_out.shape)
         seq_out = seq_out[0][:, 1:-1, :]
         # seq_out = self.dropout(seq_out)
         return seq_out
@@ -1434,6 +1436,9 @@ def predict(samples, model, model_id):
             if model_id == 1:
                 outputs = model(src_words_seq, bert_words_mask, src_pos_tags, src_words_mask, src_chars_seq, positional_seq, trg_words_seq,
                                 max_trg_len, None, None, False)
+        
+        # outputs = model(src_words_seq, bert_words_mask, src_pos_tags, src_words_mask, src_chars_seq,
+        #                     positional_seq, trg_words_seq, trigger_s.size()[1], trigger_mask, entity_mask, True)  # call seq2seqmodel()
 
         #NEED INDEX CHANGE DELETE RELATIONS
         # rel += list(outputs[0].data.cpu().numpy())

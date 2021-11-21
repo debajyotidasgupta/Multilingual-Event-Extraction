@@ -363,7 +363,7 @@ def get_F1(data, preds):
         #NEED INDEX CHANGES, 0-RELATIONS
         # pred_triples, all_pred_triples = get_pred_triples(preds[0][i], preds[1][i], preds[2][i], preds[3][i],
         #                                                   preds[4][i], preds[5][i], preds[6][i], data[i].SrcWords)
-        pred_triples, all_pred_triples = get_pred_triples(preds[0][i], preds[1][i], preds[2][i],
+        pred_triples, all_pred_triples = get_pred_triples(None,preds[0][i], preds[1][i], preds[2][i],
                                                           preds[3][i], preds[4][i], preds[5][i], data[i].SrcWords)
         total_pred_pos += len(all_pred_triples)
         gt_pos += len(gt_triples)
@@ -914,8 +914,6 @@ class BERT(nn.Module):
 
     def forward(self, input_ids, bert_mask, is_training=False):
         seq_out = self.bert(input_ids, attention_mask=bert_mask)
-        print("china bangla")
-        print(len(seq_out[1]))
         seq_out = seq_out[0][:, 1:-1, :]
         # seq_out = self.dropout(seq_out)
         return seq_out

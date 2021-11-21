@@ -1219,6 +1219,8 @@ class Seq2SeqModel(nn.Module):
                               pos_tag_seq, src_char_seq, pos_seq, is_training)
         # custom_print(enc_hs.shape)
         src_time_steps = enc_hs.shape[1]
+        print("pakistan")
+        print(enc_hs.shape)
         # custom_print('max_src_len={}'.format(src_time_steps))
         #custom_print('encoder output dim = {}'.format(enc_hs.shape))
         # custom_print('source_mask={}'.format(src_mask.shape))

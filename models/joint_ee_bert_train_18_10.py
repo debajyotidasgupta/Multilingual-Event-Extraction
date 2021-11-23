@@ -895,12 +895,6 @@ class Attention(nn.Module):
         self.v = nn.Linear(self.input_dim, 1)
 
     def forward(self, s_prev, enc_hs, src_mask):
-        if(torch.is_tensor(s_prev)):
-            print(s_prev.size())
-        if(torch.is_tensor(enc_hs)):
-            print(enc_hs.size())
-        if(torch.is_tensor(src_mask)):
-            print(src_mask.size())
         uh = self.linear_ctx(enc_hs)
         wq = self.linear_query(s_prev)
         wquh = torch.tanh(wq + uh)
@@ -1541,9 +1535,6 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
             train_samples)  # shuffle training data
         start_time = datetime.datetime.now()
         train_loss_val = 0.0
-
-        #REMOVE LATER
-        batch_count = 5
 
         for batch_idx in tqdm(range(0, batch_count)):
             batch_start = batch_idx * batch_size

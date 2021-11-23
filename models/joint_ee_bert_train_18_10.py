@@ -889,7 +889,6 @@ class Attention(nn.Module):
     def __init__(self, input_dim):
         super(Attention, self).__init__()
         self.input_dim = input_dim  # 300
-        print("Input dim="+str(input_dim))
         self.linear_ctx = nn.Linear(self.input_dim, self.input_dim, bias=False)
         self.linear_query = nn.Linear(
             self.input_dim, self.input_dim, bias=True)
@@ -1024,8 +1023,6 @@ class Decoder(nn.Module):
             self.lstm = nn.LSTMCell(10 * self.input_dim, self.hidden_dim)
         else:
             self.w = nn.Linear(8 * self.input_dim, self.input_dim)
-            print("setting attentino of input dim=")
-            print(input_dim)
             self.attention1 = Attention(input_dim)
             self.attention2 = Attention(input_dim)
             self.lstm = nn.LSTMCell(10 * self.input_dim, self.hidden_dim)
@@ -1070,46 +1067,6 @@ class Decoder(nn.Module):
         entity_mask=[bs, seq_len]
         '''
 
-        print("y_prev=")
-        if(torch.is_tensor(y_prev)):
-            print(y_prev.size())
-        else:
-            print(len(y_prev))
-        print("prev_tuples")
-        if(torch.is_tensor(prev_tuples)):
-            print(prev_tuples.size())
-        else:
-            print(len(prev_tuples))
-        print("h_prev")
-        if(torch.is_tensor(h_prev)):
-            print(h_prev.size())
-        else:
-            print(len(h_prev))
-        print("enc_hs")
-        if(torch.is_tensor(enc_hs)):
-            print(enc_hs.size())
-        else:
-            print(len(enc_hs))
-        # print("trigger")
-        # if(torch.is_tensor(trigger)):
-        #     print(trigger.size())
-        # else:
-        #     print(len(trigger))
-        # print("entity")
-        # if(torch.is_tensor(entity)):
-        #     print(entity.size())
-        # else:
-        #     print(len(entity))
-        # print("trigger_mask")
-        # if(torch.is_tensor(trigger_mask)):
-        #     print(trigger_mask.size())
-        # else:
-        #     print(len(trigger_mask))
-        # print("entity_mask")
-        # if(torch.is_tensor(entity_mask)):
-        #     print(entity_mask.size())
-        # else:
-        #     print(len(entity_mask))
         src_time_steps = enc_hs.size()[1]
 
         if att_type == 0:  # not used

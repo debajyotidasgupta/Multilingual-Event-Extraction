@@ -30,8 +30,8 @@ def tuple_parser(root: ET.Element):
     for tag in root.iter():
         if tag.tag.endswith("-ARG"):
             try:
-                event_id = tag.find("./LINK").get("EVENT_ARG")
                 phrase = [w.text.strip() for w in tag.findall(".//W")]
+                event_id = tag.find("./LINK").get("EVENT_ARG")
                 ev_arg = (
                     events[event_id]["phrase"],
                     events[event_id]["name"] + ":" + events[event_id]["type"],
@@ -86,8 +86,8 @@ def pointer_parser(root: ET.Element):
     for tag in root.iter():
         if tag.tag.endswith("-ARG"):
             try:
-                event_id = tag.find("./LINK").get("EVENT_ARG")
                 idxs = [w.attrib["count"] for w in tag.findall(".//W")]
+                event_id = tag.find("./LINK").get("EVENT_ARG")
                 ev_arg = (
                     events[event_id]["start"], events[event_id]["end"],
                     events[event_id]["name"] + ":" + events[event_id]["type"],
@@ -153,11 +153,12 @@ if __name__ == "__main__":
         tree = ET.parse(fname)
         root = tree.getroot()
 
-        if mode == "sent":
-            sent_parser(root)
-        elif mode == "tuple":
-            tuple_parser(root)
-        elif mode == "pointer":
-            pointer_parser(root)
-        else:
-            print("Garbage mode", file=stderr)
+        for p in root.findall(".//P"):
+            if mode == "sent":
+                sent_parser(p)
+            elif mode == "tuple":
+                tuple_parser(p)
+            elif mode == "pointer":
+                pointer_parser(p)
+            else:
+                print("Garbage mode", file=stderr)

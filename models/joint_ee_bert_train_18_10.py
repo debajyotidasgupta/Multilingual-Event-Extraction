@@ -889,6 +889,7 @@ class Attention(nn.Module):
     def __init__(self, input_dim):
         super(Attention, self).__init__()
         self.input_dim = input_dim  # 300
+        print("Input dim="+str(input_dim))
         self.linear_ctx = nn.Linear(self.input_dim, self.input_dim, bias=False)
         self.linear_query = nn.Linear(
             self.input_dim, self.input_dim, bias=True)
@@ -896,6 +897,8 @@ class Attention(nn.Module):
 
     def forward(self, s_prev, enc_hs, src_mask):
         uh = self.linear_ctx(enc_hs)
+        print("india")
+        print(type(s_prev))
         wq = self.linear_query(s_prev)
         wquh = torch.tanh(wq + uh)
         attn_weights = self.v(wquh).squeeze()
@@ -1070,6 +1073,8 @@ class Decoder(nn.Module):
             ctx, attn_weights = self.attention(reduce_prev_tuples.unsqueeze(1).repeat(1, src_time_steps, 1),
                                                enc_hs, src_mask)
         else:
+            print("pakistan")
+            print(type(h_prev[0]))
             ctx1, attn_weights1 = self.attention1(h_prev[0].squeeze().unsqueeze(1).repeat(1, src_time_steps, 1),
                                                   enc_hs, src_mask)
             reduce_prev_tuples = self.w(prev_tuples)
@@ -1441,9 +1446,6 @@ def predict(samples, model, model_id):
         src_chars_seq = autograd.Variable(src_chars_seq)
         #adj = autograd.Variable(adj)
         positional_seq = autograd.Variable(positional_seq)
-
-        print("india")
-        return None
 
         with torch.no_grad():
             if model_id == 1:

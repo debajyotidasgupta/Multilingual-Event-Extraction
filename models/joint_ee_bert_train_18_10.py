@@ -1112,11 +1112,15 @@ class Decoder(nn.Module):
             ctx, attn_weights = self.attention(reduce_prev_tuples.unsqueeze(1).repeat(1, src_time_steps, 1),
                                                enc_hs, src_mask)
         else:
+            print("redtube")
             ctx1, attn_weights1 = self.attention1(h_prev[0].squeeze().unsqueeze(1).repeat(1, src_time_steps, 1),
                                                   enc_hs, src_mask)
+            print("pornhub")
             reduce_prev_tuples = self.w(prev_tuples)
+            print("xvideos")
             ctx2, attn_weights2 = self.attention2(reduce_prev_tuples.unsqueeze(1).repeat(1, src_time_steps, 1),
                                                   enc_hs, src_mask)
+            print("xnxx")
             ctx = torch.cat((ctx1, ctx2), -1)  # [bs,2*300]
             attn_weights = (attn_weights1 + attn_weights2) / \
                 2  # [bs,src_seq_len]

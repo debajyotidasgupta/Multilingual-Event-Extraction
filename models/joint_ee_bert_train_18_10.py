@@ -201,6 +201,11 @@ def is_full_match(triplet, triplets):
 
 # In[116]:
 
+def is_partial_match(triplet,triplets):
+    for t in triplets:
+        if t[0] == triplet[0] or t[1] == triplet[1] or t[2] == triplet[2] or t[3] == triplet[3]:
+            return True
+    return False
 
 def get_gt_triples(src_words, rels, pointers, event_list, arg_list):
     touples = []
@@ -212,7 +217,7 @@ def get_gt_triples(src_words, rels, pointers, event_list, arg_list):
         # ), argIdxToName[arg_list[i]], relIdxToName[r])
         touplet = (arg1.strip(), eventIdxToName[event_list[i]], arg2.strip(
         ), argIdxToName[arg_list[i]])
-        if not is_full_match(touplet, touples):
+        if not is_partial_match(touplet, touples):
             touples.append(touplet)
         i += 1
     '''
@@ -322,7 +327,7 @@ def get_pred_triples(rel, arg1s, arg1e, arg2s, arg2e, eTypes, aTypes, src_words)
         if (touplet[0], touplet[1], touplet[2]) in [(t[0], t[1], t[2]) for t in touples]:
             continue
         all_touples.append(touplet)
-        if not is_full_match(touplet, touples):
+        if not is_partial_match(touplet, touples):
             touples.append(touplet)
     '''
 

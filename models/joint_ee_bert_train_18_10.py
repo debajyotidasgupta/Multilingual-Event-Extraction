@@ -217,7 +217,7 @@ def get_gt_triples(src_words, rels, pointers, event_list, arg_list):
         # ), argIdxToName[arg_list[i]], relIdxToName[r])
         touplet = (arg1.strip(), eventIdxToName[event_list[i]], arg2.strip(
         ), argIdxToName[arg_list[i]])
-        if not is_partial_match(touplet, touples):
+        if not is_full_match(touplet, touples):
             touples.append(touplet)
         i += 1
     '''
@@ -327,7 +327,7 @@ def get_pred_triples(rel, arg1s, arg1e, arg2s, arg2e, eTypes, aTypes, src_words)
         if (touplet[0], touplet[1], touplet[2]) in [(t[0], t[1], t[2]) for t in touples]:
             continue
         all_touples.append(touplet)
-        if not is_partial_match(touplet, touples):
+        if not is_full_match(touplet, touples):
             touples.append(touplet)
     '''
 
@@ -1441,6 +1441,9 @@ def predict(samples, model, model_id):
         src_chars_seq = autograd.Variable(src_chars_seq)
         #adj = autograd.Variable(adj)
         positional_seq = autograd.Variable(positional_seq)
+
+        print("india")
+        return None
 
         with torch.no_grad():
             if model_id == 1:

@@ -897,8 +897,6 @@ class Attention(nn.Module):
 
     def forward(self, s_prev, enc_hs, src_mask):
         uh = self.linear_ctx(enc_hs)
-        print("india")
-        print(s_prev.size())
         wq = self.linear_query(s_prev)
         wquh = torch.tanh(wq + uh)
         attn_weights = self.v(wquh).squeeze()
@@ -1063,6 +1061,23 @@ class Decoder(nn.Module):
         trigger_mask=[bs, seq_len]
         entity_mask=[bs, seq_len]
         '''
+
+        print("y_prev=")
+        print(y_prev.size())
+        print("prev_tuples")
+        print(prev_tuples.size())
+        print("h_prev")
+        print(h_prev.size())
+        print("enc_hs")
+        print(enc_hs.size())
+        print("trigger")
+        print(trigger.size())
+        print("entity")
+        print(entity.size())
+        print("trigger_mask")
+        print(trigger_mask.size())
+        print("entity_mask")
+        print(entity_mask.size())
         src_time_steps = enc_hs.size()[1]
 
         if att_type == 0:  # not used
@@ -1073,8 +1088,6 @@ class Decoder(nn.Module):
             ctx, attn_weights = self.attention(reduce_prev_tuples.unsqueeze(1).repeat(1, src_time_steps, 1),
                                                enc_hs, src_mask)
         else:
-            print("pakistan")
-            print(h_prev[0].size())
             ctx1, attn_weights1 = self.attention1(h_prev[0].squeeze().unsqueeze(1).repeat(1, src_time_steps, 1),
                                                   enc_hs, src_mask)
             reduce_prev_tuples = self.w(prev_tuples)

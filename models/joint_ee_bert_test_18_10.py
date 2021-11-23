@@ -48,11 +48,11 @@ def get_data(src_lines, trg_lines, pos_lines, datatype):
     for i in range(0, len(src_lines)):  # for each line
         src_line = src_lines[i].strip()
         trg_line = trg_lines[i].strip()
-        pos_line = pos_lines[i].strip()
+        #pos_line = pos_lines[i].strip()
         src_words = src_line.split()
-        word_pos_tags = pos_line.split()
+        #word_pos_tags = pos_line.split()
 
-        trg_rels = []  # holds relations present in a sentence
+        #trg_rels = []  # holds relations present in a sentence
         trg_events = []  # holds events present in a sentence
         trg_args = []  # holds arguments present in a sentence
         trg_pointers = []  # holds tuples containg records per relation
@@ -69,16 +69,16 @@ def get_data(src_lines, trg_lines, pos_lines, datatype):
         for part in parts:
             elements = part.strip().split()
             tuples_in.append((int(elements[0]), int(elements[1]), eventnameToIdx[elements[2]], int(
-                elements[3]), int(elements[4]), argnameToIdx[elements[5]], relnameToIdx[elements[6]]))
+                elements[3]), int(elements[4]), argnameToIdx[elements[5]]))
 
-        if datatype == 1:
+        if datatype == 1 or datatype==2:
             tuples_in = sorted(
                 tuples_in, key=lambda element: (element[0], element[3]))
         for elements in tuples_in:
             #elements = part.strip().split()
             # print(elements)
             # relation index (corresponding to the relation_name from relation_vocab)
-            trg_rels.append(elements[6])
+            #trg_rels.append(elements[6])
             trg_events.append(elements[2])  # event index
             trg_args.append(elements[5])  # arg index
             # all the records like event-start_index, end_index, entity- start_index, end_index
@@ -86,12 +86,12 @@ def get_data(src_lines, trg_lines, pos_lines, datatype):
                 elements[1]), int(elements[3]), int(elements[4])))
 
         # if cross max_sentence_length or max_trg_length(max no of relation tuples present in the sentence)
-        if datatype == 1 and (len(src_words) > max_src_len or len(trg_rels) > max_trg_len):
+        if (datatype == 1 or datatype==2) and (len(src_words) > max_src_len:
             # print(src_line)
             # print(trg_line)
             continue
 
-        sample = Sample(Id=uid, SrcLen=len(src_words), SrcWords=src_words, PosTags=word_pos_tags, TrgLen=len(trg_rels), TrgRels=trg_rels,
+        sample = Sample(Id=uid, SrcLen=len(src_words), SrcWords=src_words, TrgLen=len(trg_parts), 
                         TrgPointers=trg_pointers, eventTypes=trg_events, argTypes=trg_args)  # recordclass("Sample", "Id SrcLen SrcWords TrgLen TrgRels eventTypes argTypes TrgPointers")
         samples.append(sample)
         uid += 1
@@ -110,9 +110,9 @@ def read_data(src_file, trg_file, pos_dev_file, datatype):
     trg_lines = reader.readlines()
     reader.close()
 
-    reader = open(pos_dev_file)
-    pos_lines = reader.readlines()
-    reader.close()
+    # reader = open(pos_dev_file)
+    # pos_lines = reader.readlines()
+    # reader.close()
 
     # l = 1000
     # src_lines = src_lines[0:min(l, len(src_lines))]
@@ -197,11 +197,16 @@ def is_full_match(triplet, triplets):
 
 # In[116]:
 
+def is_partial_match(triplet,triplets):
+    for t in triplets:
+        if t[0] == triplet[0] or t[1] == triplet[1] or t[2] == triplet[2] or t[3] == triplet[3]:
+            return True
+    return False
 
 def get_gt_triples(src_words, rels, pointers, event_list, arg_list):
     touples = []
     i = 0
-    for r in rels:
+    for r in pointers:
         arg1 = ' '.join(src_words[pointers[i][0]:pointers[i][1] + 1])
         arg2 = ' '.join(src_words[pointers[i][2]:pointers[i][3] + 1])
         touplet = (arg1.strip(), eventIdxToName[event_list[i]], arg2.strip(

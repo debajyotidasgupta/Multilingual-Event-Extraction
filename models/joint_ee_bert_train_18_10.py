@@ -239,6 +239,7 @@ def get_answer_pointers(arg1start_preds, arg1end_preds, arg2start_preds, arg2end
     arg1_prob = -1.0
     arg1start = -1
     arg1end = -1
+    #FIND MAX LENGTH OF TRIGGER PHRASE AND ENTITY PHRASE
     max_ent_len = 38  # 5
     max_trig_len = 7
     for i in range(0, sent_len):
@@ -324,8 +325,10 @@ def get_pred_triples(rel, arg1s, arg1e, arg2s, arg2e, eTypes, aTypes, src_words)
         touplet = (arg1, eventIdxToName[ev], arg2,
                    argIdxToName[at])
         # same (trigger, argument) pair can not have two different role
-        if (touplet[0], touplet[1], touplet[2]) in [(t[0], t[1], t[2]) for t in touples]:
+        if (touplet[0], touplet[2]) in [(t[0], t[2]) for t in touples]:
             continue
+        # if (touplet[0], touplet[1], touplet[2]) in [(t[0], t[1], t[2]) for t in touples]:
+        #     continue
         all_touples.append(touplet)
         if not is_full_match(touplet, touples):
             touples.append(touplet)
@@ -370,9 +373,9 @@ def get_F1(data, preds):
         #                                                   preds[4][i], preds[5][i], preds[6][i], data[i].SrcWords)
         pred_triples, all_pred_triples = get_pred_triples(None,preds[0][i], preds[1][i], preds[2][i],
                                                           preds[3][i], preds[4][i], preds[5][i], data[i].SrcWords)
-        total_pred_pos += len(all_pred_triples)
-        gt_pos += len(gt_triples)
-        pred_pos += len(pred_triples)
+        total_pred_pos += len(all_pred_triples)#predicted all tuples
+        gt_pos += len(gt_triples)#actual tuples in data
+        pred_pos += len(pred_triples)#predicted unique tuples
         for gt_triple in gt_triples:
             if is_full_match(gt_triple, pred_triples):
                 correct_pos += 1

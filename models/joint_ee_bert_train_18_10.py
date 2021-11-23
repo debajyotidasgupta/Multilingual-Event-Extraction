@@ -1063,21 +1063,45 @@ class Decoder(nn.Module):
         '''
 
         print("y_prev=")
-        print(y_prev.size())
+        if(torch.is_tensor(y_prev)):
+            print(y_prev.size())
+        else:
+            print(len(y_prev))
         print("prev_tuples")
-        print(prev_tuples.size())
+        if(torch.is_tensor(prev_tuples)):
+            print(prev_tuples.size())
+        else:
+            print(len(prev_tuples))
         print("h_prev")
-        print(h_prev.size())
+        if(torch.is_tensor(h_prev)):
+            print(h_prev.size())
+        else:
+            print(len(h_prev))
         print("enc_hs")
-        print(enc_hs.size())
+        if(torch.is_tensor(enc_hs)):
+            print(enc_hs.size())
+        else:
+            print(len(enc_hs))
         print("trigger")
-        print(trigger.size())
+        if(torch.is_tensor(trigger)):
+            print(trigger.size())
+        else:
+            print(len(trigger))
         print("entity")
-        print(entity.size())
+        if(torch.is_tensor(entity)):
+            print(entity.size())
+        else:
+            print(len(entity))
         print("trigger_mask")
-        print(trigger_mask.size())
+        if(torch.is_tensor(trigger_mask)):
+            print(trigger_mask.size())
+        else:
+            print(len(trigger_mask))
         print("entity_mask")
-        print(entity_mask.size())
+        if(torch.is_tensor(entity_mask)):
+            print(entity_mask.size())
+        else:
+            print(len(entity_mask))
         src_time_steps = enc_hs.size()[1]
 
         if att_type == 0:  # not used

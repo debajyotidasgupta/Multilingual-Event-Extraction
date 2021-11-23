@@ -1018,6 +1018,8 @@ class Decoder(nn.Module):
             self.lstm = nn.LSTMCell(10 * self.input_dim, self.hidden_dim)
         else:
             self.w = nn.Linear(8 * self.input_dim, self.input_dim)
+            print("setting attentino of input dim=")
+            print(input_dim)
             self.attention1 = Attention(input_dim)
             self.attention2 = Attention(input_dim)
             self.lstm = nn.LSTMCell(10 * self.input_dim, self.hidden_dim)

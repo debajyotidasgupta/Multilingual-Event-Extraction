@@ -896,6 +896,12 @@ class Attention(nn.Module):
         self.v = nn.Linear(self.input_dim, 1)
 
     def forward(self, s_prev, enc_hs, src_mask):
+        if(torch.is_tensor(s_prev)):
+            print(s_prev.size())
+        if(torch.is_tensor(enc_hs)):
+            print(enc_hs.size())
+        if(torch.is_tensor(src_mask)):
+            print(src_mask.size())
         uh = self.linear_ctx(enc_hs)
         wq = self.linear_query(s_prev)
         wquh = torch.tanh(wq + uh)
@@ -1084,16 +1090,16 @@ class Decoder(nn.Module):
             print(enc_hs.size())
         else:
             print(len(enc_hs))
-        print("trigger")
-        if(torch.is_tensor(trigger)):
-            print(trigger.size())
-        else:
-            print(len(trigger))
-        print("entity")
-        if(torch.is_tensor(entity)):
-            print(entity.size())
-        else:
-            print(len(entity))
+        # print("trigger")
+        # if(torch.is_tensor(trigger)):
+        #     print(trigger.size())
+        # else:
+        #     print(len(trigger))
+        # print("entity")
+        # if(torch.is_tensor(entity)):
+        #     print(entity.size())
+        # else:
+        #     print(len(entity))
         # print("trigger_mask")
         # if(torch.is_tensor(trigger_mask)):
         #     print(trigger_mask.size())
@@ -1114,15 +1120,11 @@ class Decoder(nn.Module):
             ctx, attn_weights = self.attention(reduce_prev_tuples.unsqueeze(1).repeat(1, src_time_steps, 1),
                                                enc_hs, src_mask)
         else:
-            print("redtube")
             ctx1, attn_weights1 = self.attention1(h_prev[0].squeeze().unsqueeze(1).repeat(1, src_time_steps, 1),
                                                   enc_hs, src_mask)
-            print("pornhub")
             reduce_prev_tuples = self.w(prev_tuples)
-            print("xvideos")
             ctx2, attn_weights2 = self.attention2(reduce_prev_tuples.unsqueeze(1).repeat(1, src_time_steps, 1),
                                                   enc_hs, src_mask)
-            print("xnxx")
             ctx = torch.cat((ctx1, ctx2), -1)  # [bs,2*300]
             attn_weights = (attn_weights1 + attn_weights2) / \
                 2  # [bs,src_seq_len]

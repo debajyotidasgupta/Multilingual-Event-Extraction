@@ -1092,11 +1092,11 @@ class Decoder(nn.Module):
             print(entity.size())
         else:
             print(len(entity))
-        print("trigger_mask")
-        if(torch.is_tensor(trigger_mask)):
-            print(trigger_mask.size())
-        else:
-            print(len(trigger_mask))
+        # print("trigger_mask")
+        # if(torch.is_tensor(trigger_mask)):
+        #     print(trigger_mask.size())
+        # else:
+        #     print(len(trigger_mask))
         print("entity_mask")
         if(torch.is_tensor(entity_mask)):
             print(entity_mask.size())

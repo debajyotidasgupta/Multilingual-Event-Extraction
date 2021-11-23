@@ -1036,9 +1036,10 @@ class Decoder(nn.Module):
         self.entity_e_lin = nn.Linear(2 * self.input_dim, 1)
 
         # ***************to identify the event type
+        #5
         self.et_lin = nn.Linear(9 * self.input_dim, len(eventnameToIdx))
         # ***************to identify the argumwnt type
-        self.argt_lin = nn.Linear(9 * self.input_dim, len(argnameToIdx))
+        self.argt_lin = nn.Linear(9 * self.input_dim, len(argnameToIdx))#9*input_dim+unique events
 
         # to identify the role
         # self.rel_lin = nn.Linear(9 * self.input_dim, len(relnameToIdx))
@@ -1078,7 +1079,7 @@ class Decoder(nn.Module):
             attn_weights = (attn_weights1 + attn_weights2) / \
                 2  # [bs,src_seq_len]
 
-        s_cur = torch.cat((prev_tuples, ctx), 1)  # [bs, 11*300]
+        s_cur = torch.cat((prev_tuples, ctx), 1)  # [bs, 10*300]
         hidden, cell_state = self.lstm(s_cur, h_prev)
         hidden = self.dropout(hidden)  # [bs, 300]
 
@@ -1120,12 +1121,12 @@ class Decoder(nn.Module):
         # normaized probability of each word index to be the end index of arg1
         trig_e_weights = F.softmax(trig_e, dim=-1)
 
-        trig_sv = torch.bmm(trig_e_weights.unsqueeze(
+        trig_sv = torch.bmm(trig_e_weights.unsqueeze(#bs,1,src_len], [bs,src_len,2*300]
             1), trig_pointer_lstm_out).squeeze()  # [bs,2*300]
         trig_ev = torch.bmm(trig_s_weights.unsqueeze(
             1), trig_pointer_lstm_out).squeeze()  # [bs, 2*300]
         # [bs,4*300]#holds trigger and event type representation
-        trig_et = self.dropout(torch.cat((trig_sv, trig_ev), -1))
+        trig_et = self.dropout(torch.cat((trig_sv, trig_ev), -1)) # [bs,4*300]
 
         ent_s_weights = F.softmax(ent_s, dim=-1)
         ent_e_weights = F.softmax(ent_e, dim=-1)
@@ -1161,10 +1162,12 @@ class Decoder(nn.Module):
         #     sent = self.dropout(multi_head_pooling(mh_hid, src_mask, 'max'))
 
         # [bs, 9*300]--->[bs, 33]
+        #EVENT DEPENDS ON EVENT PHRASE ONLY, omit ent_argt
         event_types = self.et_lin(torch.cat((trig_et, ent_argt, hidden), -1))
         #custom_print('event_types size={}'.format(event_types.shape))
         # [bs, 9*300]----> [bs, 7]
         arg_types = self.argt_lin(torch.cat((ent_argt, trig_et, hidden), -1))
+        # arg_types = self.argt_lin(torch.cat((ent_argt, trig_et, event_types, hidden), -1)) [bs,9*300+36]
         #custom_print('arg_types size={}'.format(arg_types.shape))
         # [bs,9*300]---->[bs, 36]
         #rel = self.rel_lin(torch.cat((hidden, trig_et, ent_argt), -1))

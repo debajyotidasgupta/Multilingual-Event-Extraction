@@ -898,7 +898,7 @@ class Attention(nn.Module):
     def forward(self, s_prev, enc_hs, src_mask):
         uh = self.linear_ctx(enc_hs)
         print("india")
-        print(type(s_prev))
+        print(s_prev.size())
         wq = self.linear_query(s_prev)
         wquh = torch.tanh(wq + uh)
         attn_weights = self.v(wquh).squeeze()
@@ -1074,7 +1074,7 @@ class Decoder(nn.Module):
                                                enc_hs, src_mask)
         else:
             print("pakistan")
-            print(type(h_prev[0]))
+            print(h_prev[0].size())
             ctx1, attn_weights1 = self.attention1(h_prev[0].squeeze().unsqueeze(1).repeat(1, src_time_steps, 1),
                                                   enc_hs, src_mask)
             reduce_prev_tuples = self.w(prev_tuples)

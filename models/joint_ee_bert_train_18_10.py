@@ -1097,11 +1097,11 @@ class Decoder(nn.Module):
         #     print(trigger_mask.size())
         # else:
         #     print(len(trigger_mask))
-        print("entity_mask")
-        if(torch.is_tensor(entity_mask)):
-            print(entity_mask.size())
-        else:
-            print(len(entity_mask))
+        # print("entity_mask")
+        # if(torch.is_tensor(entity_mask)):
+        #     print(entity_mask.size())
+        # else:
+        #     print(len(entity_mask))
         src_time_steps = enc_hs.size()[1]
 
         if att_type == 0:  # not used
@@ -1580,6 +1580,9 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
             train_samples)  # shuffle training data
         start_time = datetime.datetime.now()
         train_loss_val = 0.0
+
+        #REMOVE LATER
+        batch_count = 5
 
         for batch_idx in tqdm(range(0, batch_count)):
             batch_start = batch_idx * batch_size

@@ -1525,8 +1525,6 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
     best_dev_acc = -1.0
     best_epoch_idx = -1
     best_epoch_seed = -1
-
-    model.load_state_dict(torch.load(best_model_file))
     for epoch_idx in range(0, num_epoch):
         model.train()
         model.zero_grad()

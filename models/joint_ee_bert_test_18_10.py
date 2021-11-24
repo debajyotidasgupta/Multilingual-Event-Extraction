@@ -236,8 +236,8 @@ def get_answer_pointers(arg1start_preds, arg1end_preds, arg2start_preds, arg2end
     arg1start = -1
     arg1end = -1
     #FIND MAX LENGTH OF TRIGGER PHRASE AND ENTITY PHRASE
-    max_ent_len = 68  # 5
-    max_trig_len = 22
+    max_ent_len = 68  #BENGALI 28 HINDI 68
+    max_trig_len = 22  #BENGALI 7  HINDI 22 
     for i in range(0, sent_len):
         for j in range(i, min(sent_len, i + max_trig_len)):
             if arg1start_preds[i] * arg1end_preds[j] > arg1_prob:
@@ -319,7 +319,7 @@ def get_pred_triples(rel, arg1s, arg1e, arg2s, arg2e, eTypes, aTypes, src_words)
         # touplet = (arg1, eventIdxToName[ev], arg2,
         #            argIdxToName[at], relIdxToName[r])
         touplet = (arg1, eventIdxToName[ev], arg2,
-                   argIdxToName[at], relIdxToName[r])
+                   argIdxToName[at])
         # same (trigger, argument) pair can not have two different role
         if (touplet[0], touplet[2]) in [(t[0], t[2]) for t in touples]:
             continue
@@ -1191,7 +1191,7 @@ class Decoder(nn.Module):
             trig_e = F.log_softmax(trig_e, dim=-1)  # [bs,max_src_len]
             ent_s = F.log_softmax(ent_s, dim=-1)  # [bs,max_src_len]
             ent_e = F.log_softmax(ent_e, dim=-1)  # [bs,max_src_len]
-            rel = F.log_softmax(rel, dim=-1)  # [bs,max_rel_types]
+            # rel = F.log_softmax(rel, dim=-1)  # [bs,max_rel_types]
             event_types = F.log_softmax(
                 event_types, dim=-1)  # [bs, no_event_types]
             arg_types = F.log_softmax(arg_types, dim=-1)  # [bs, no_arg_types]

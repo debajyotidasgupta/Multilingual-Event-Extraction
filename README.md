@@ -16,8 +16,18 @@ NLP Term Project
 ```
 
 ## Important files
-joint_ee_bert_train_18_10.py - Script for training the neral network model \
+joint_ee_bert_train_18_10.py - Script for training the neural network model \
 joint_ee_bert_test_18_10.py - Script for testing the trained model
+
+## Description of scripts
+
+- `parser.py`: Parses a given directory of XML files into sentence, tuple and pointer files.
+- `cleanup.py`: Deletes sentences with 0 events and 0 arguments.
+- `event_arg_gen.sh`: Generates the text files with distinct events and argument names.
+- `get_sent_len.py`: Sentence length statistics
+- `phrase_len.py`: Trigger phrase length statistics
+- `f1_plot.py`: Plots the epoch vs f1 score given the training log file.
+- `gen_stat.py`: Generates overall trigger phrase stats.
 
 ## Hyperparameters
 

@@ -91,7 +91,7 @@ def get_data(src_lines, trg_lines, pos_lines, datatype):
             # print(trg_line)
             continue
 
-        sample = Sample(Id=uid, SrcLen=len(src_words), SrcWords=src_words, TrgLen=len(trg_parts), 
+        sample = Sample(Id=uid, SrcLen=len(src_words), SrcWords=src_words, TrgLen=len(parts) , 
                         TrgPointers=trg_pointers, eventTypes=trg_events, argTypes=trg_args)  # recordclass("Sample", "Id SrcLen SrcWords TrgLen TrgRels eventTypes argTypes TrgPointers")
         samples.append(sample)
         uid += 1

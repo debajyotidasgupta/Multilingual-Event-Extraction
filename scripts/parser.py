@@ -4,6 +4,7 @@ import os
 from sys import argv, exit, stderr
 import xml.etree.ElementTree as ET
 from pprint import pprint
+from copy import deepcopy
 
 
 def sent_parser(root: ET.Element):
@@ -18,6 +19,8 @@ def tuple_parser(root: ET.Element):
     for tag in root.iter():
         if tag.tag.endswith("_EVENT"):
             phrase = [w.text.strip() for w in tag.findall(".//W")]
+            if len(phrase) == 0:
+                continue
             events[tag.attrib["ID"]] = {
                 "id": tag.attrib["ID"],
                 "name": tag.tag,
@@ -30,8 +33,10 @@ def tuple_parser(root: ET.Element):
     for tag in root.iter():
         if tag.tag.endswith("-ARG"):
             try:
-                event_id = tag.find("./LINK").get("EVENT_ARG")
                 phrase = [w.text.strip() for w in tag.findall(".//W")]
+                if len(phrase) == 0:
+                    continue
+                event_id = tag.find("./LINK").get("EVENT_ARG")
                 ev_arg = (
                     events[event_id]["phrase"],
                     events[event_id]["name"] + ":" + events[event_id]["type"],
@@ -73,6 +78,8 @@ def pointer_parser(root: ET.Element):
     for tag in root.iter():
         if tag.tag.endswith("_EVENT"):
             idxs = [w.attrib["count"] for w in tag.findall(".//W")]
+            if len(idxs) == 0:
+                continue
             events[tag.attrib["ID"]] = {
                 "id": tag.attrib["ID"],
                 "name": tag.tag,
@@ -86,8 +93,10 @@ def pointer_parser(root: ET.Element):
     for tag in root.iter():
         if tag.tag.endswith("-ARG"):
             try:
-                event_id = tag.find("./LINK").get("EVENT_ARG")
                 idxs = [w.attrib["count"] for w in tag.findall(".//W")]
+                if len(idxs) == 0:
+                    continue
+                event_id = tag.find("./LINK").get("EVENT_ARG")
                 ev_arg = (
                     events[event_id]["start"], events[event_id]["end"],
                     events[event_id]["name"] + ":" + events[event_id]["type"],
@@ -117,6 +126,37 @@ def pointer_parser(root: ET.Element):
 
     print("|".join([";".join(w) for w in event_args]))
 
+# Structure:
+#    Document -> P -> W
+# OR Document -> P -> ARG/Event -> W
+def break_p(root:ET.Element, delim):
+    p_cnt = 0
+    for p in root.findall(".//P"):
+        for w in p.findall(".//W"):
+            w.set("P_CNT", p_cnt)
+            if delim in w.text:
+                p_cnt += 1
+        p_cnt += 1
+
+    ps = root.findall(".//P")
+    ps_final = {}
+
+    for p in ps:
+        pc = set()
+        for w in p.findall(".//W"):
+            pc.add(w.get("P_CNT"))
+        
+        for c in pc:
+            ps_final[c] = deepcopy(p)
+    
+    for k, v in ps_final.items():
+        for w in v.findall(".//W"):
+            if w.get("P_CNT") != k:
+                for el in v.iter():
+                    if w in el:
+                        el.remove(w)
+
+    return list(ps_final.values())    
 
 if __name__ == "__main__":
     if len(argv) not in [2, 3]:
@@ -153,11 +193,12 @@ if __name__ == "__main__":
         tree = ET.parse(fname)
         root = tree.getroot()
 
-        if mode == "sent":
-            sent_parser(root)
-        elif mode == "tuple":
-            tuple_parser(root)
-        elif mode == "pointer":
-            pointer_parser(root)
-        else:
-            print("Garbage mode", file=stderr)
+        for p in break_p(root, '।'):
+            if mode == "sent":
+                sent_parser(p)
+            elif mode == "tuple":
+                tuple_parser(p)
+            elif mode == "pointer":
+                pointer_parser(p)
+            else:
+                print("Garbage mode", file=stderr)

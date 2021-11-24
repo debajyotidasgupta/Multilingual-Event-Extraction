@@ -1730,7 +1730,7 @@ random_seed = 1033
 torch.manual_seed(random_seed)
 # set_random_seeds(random_seed)
 batch_size = 32
-num_epoch = 10
+num_epoch = 100
 model_name = 1
 
 logger = open('test_18_10.log', 'w+')

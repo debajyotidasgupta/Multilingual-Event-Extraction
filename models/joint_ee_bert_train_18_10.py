@@ -1254,7 +1254,7 @@ class Seq2SeqModel(nn.Module):
             batch_len, 4 * dec_hidden_size))).cuda()  # [bs, 4*300]
 
         # prev_tuples = torch.cat((trigger, entity, dec_inp), -1)  # [bs, 9*300]
-        prev_tuples = torch.cat((trigger, entity), -1)  # [bs, 9*300]
+        prev_tuples = torch.cat((trigger, entity), -1)  # [bs, 8*300]
         #custom_print('start decoding.....')
         if is_training:
             dec_outs = self.decoder(dec_inp, prev_tuples, dec_hid, enc_hs, src_mask, trigger, entity,
@@ -1292,7 +1292,7 @@ class Seq2SeqModel(nn.Module):
                 # prev_tuples = torch.cat(
                 #     (trigger, entity, dec_inp), -1) + prev_tuples  # [bs, 9*300]
                 prev_tuples = torch.cat(
-                    (trigger, entity), -1) + prev_tuples  # [bs, 9*300]
+                    (trigger, entity), -1) + prev_tuples  # [bs, 8*300]
                 dec_outs = self.decoder(dec_inp, prev_tuples, dec_hid, enc_hs, src_mask, trigger, entity,
                                         trigger_mask[:, t, :].squeeze(), entity_mask[:, t, :].squeeze(), is_training)
             else:
@@ -1495,7 +1495,7 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
     #print('Parameters size:', pytorch_total_params)
     custom_print('Parameters size:', pytorch_total_params)
     # print(model)
-    #custom_print(model)
+    custom_print(model)
     if torch.cuda.is_available():
         model.cuda()
     if n_gpu > 1:

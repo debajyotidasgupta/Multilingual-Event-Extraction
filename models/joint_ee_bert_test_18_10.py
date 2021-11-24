@@ -86,7 +86,7 @@ def get_data(src_lines, trg_lines, pos_lines, datatype):
                 elements[1]), int(elements[3]), int(elements[4])))
 
         # if cross max_sentence_length or max_trg_length(max no of relation tuples present in the sentence)
-        if (datatype == 1 or datatype==2) and (len(src_words) > max_src_len:
+        if (datatype == 1 or datatype==2) and (len(src_words) > max_src_len):
             # print(src_line)
             # print(trg_line)
             continue
@@ -370,7 +370,7 @@ def get_F1(data, preds):
 
         # pred_triples, all_pred_triples = get_pred_triples(preds[0][i], preds[1][i], preds[2][i], preds[3][i],
         #                                                   preds[4][i], preds[5][i], preds[6][i], data[i].SrcWords)
-         pred_triples, all_pred_triples = get_pred_triples(None,preds[0][i], preds[1][i], preds[2][i],
+        pred_triples, all_pred_triples = get_pred_triples(None,preds[0][i], preds[1][i], preds[2][i],
                                                           preds[3][i], preds[4][i], preds[5][i], data[i].SrcWords)
         total_pred_pos += len(all_pred_triples)
         gt_pos += len(gt_triples)

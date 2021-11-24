@@ -236,8 +236,8 @@ def get_answer_pointers(arg1start_preds, arg1end_preds, arg2start_preds, arg2end
     arg1start = -1
     arg1end = -1
     #FIND MAX LENGTH OF TRIGGER PHRASE AND ENTITY PHRASE
-    max_ent_len = 28  # 5
-    max_trig_len = 7
+    max_ent_len = 68  # 5
+    max_trig_len = 22
     for i in range(0, sent_len):
         for j in range(i, min(sent_len, i + max_trig_len)):
             if arg1start_preds[i] * arg1end_preds[j] > arg1_prob:
@@ -1741,8 +1741,8 @@ bert_model_name = 'bert-base-multilingual-cased'
 bert_tokenizer = BertTokenizer.from_pretrained(
     bert_model_name, do_basic_tokenize=False)
 
-max_src_len = 106  # max sentence length = 135
-max_trg_len = 15  # max number of tuple
+max_src_len = 199  # max sentence length = 135
+max_trg_len = 28  # max number of tuple
 embedding_file = './joint_ee/w2v.txt'  # pretrained word embeddings file
 word_embed_dim = 300
 word_min_freq = 2
@@ -1756,7 +1756,7 @@ conv_filter_size = 3
 max_word_len = 10
 positional_embed_dim = word_embed_dim
 #max_positional_idx = 100
-max_positional_idx = 106
+max_positional_idx = 199
 
 # enc_inp_size = bert_base_size + pos_embed_dim + char_feature_size
 enc_inp_size = bert_base_size

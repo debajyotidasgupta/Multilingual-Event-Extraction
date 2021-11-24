@@ -30,6 +30,7 @@ from collections import OrderedDict
 import numpy as np
 import random
 import pickle
+
 import sys
 
 language_hyperparameters = {
@@ -1028,7 +1029,6 @@ class Decoder(nn.Module):
         self.drop_rate = drop_out_rate
         self.max_length = max_length
 
-
         if att_type == 0:
             self.attention = Attention(input_dim)
             self.lstm = nn.LSTMCell(10 * self.input_dim, self.hidden_dim)
@@ -1255,8 +1255,6 @@ class Seq2SeqModel(nn.Module):
                               pos_tag_seq, src_char_seq, pos_seq, is_training)
         # custom_print(enc_hs.shape)
         src_time_steps = enc_hs.shape[1]
-        print("china:")
-        print(enc_hs.shape)
         # custom_print('max_src_len={}'.format(src_time_steps))
         #custom_print('encoder output dim = {}'.format(enc_hs.shape))
         # custom_print('source_mask={}'.format(src_mask.shape))
@@ -1744,7 +1742,7 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
 
 
 n_gpu = torch.cuda.device_count()
-random_seed = 1033
+random_seed = 1023
 if len(sys.argv)>=3:
     random_seed = int(sys.argv[2])
 torch.manual_seed(random_seed)
@@ -1814,22 +1812,23 @@ custom_print('loading data......')
 
 src_train_file = '../data/processed/train_'+language+'.sent'
 trg_train_file = '../data/processed/train_'+language+'.pointer'
-# pos_train_file = '../data/train_bengali.tuple'
+# pos_train_file = 'train_bert.pos'
 
 # call read_data() for train_set
 # train_data = read_data(src_train_file, trg_train_file, pos_train_file, 1)
 train_data = read_data(src_train_file, trg_train_file, None, 1)
 
+
 src_dev_file = '../data/processed/valid_'+language+'.sent'
 trg_dev_file = '../data/processed/valid_'+language+'.pointer'
-# pos_dev_file = '../data/valid_bengali.tuple'
+# pos_dev_file = 'dev_bert.pos'
 # call read_data() for dev_set
 # dev_data = read_data(src_dev_file, trg_dev_file, pos_dev_file, 2)
 dev_data = read_data(src_dev_file, trg_dev_file, None, 2)
 
 src_test_file = '../data/processed/test_'+language+'.sent'
 trg_test_file = '../data/processed/test_'+language+'.pointer'
-# pos_test_file = '../data/test_bengali.tuple'
+# pos_test_file = 'test_bert.pos'
 # call read_data() for dev_set
 # test_data = read_data(src_test_file, trg_test_file, pos_test_file, 3)
 test_data = read_data(src_test_file, trg_test_file, None, 3)
@@ -1851,7 +1850,7 @@ custom_print("getting pos tags......")
 custom_print("Training started......")
 
 model_name = 1
-model_file_name = 'model_bert_19_10.h5py'
+model_file_name = 'model_bert_19_10_'+language+'.h5py'
 
 train_model(model_name, train_data, dev_data,
             model_file_name)  # call train_model()

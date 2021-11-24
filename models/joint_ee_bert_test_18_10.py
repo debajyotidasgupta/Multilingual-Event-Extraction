@@ -1838,7 +1838,7 @@ custom_print("getting pos tags......")
 # custom_print('vocab size:', len(word_vocab))
 
 # model_file = './joint_ee/5_10_21/model_pos.h5py'
-model_file = 'model_pos.h5py'
+model_file = 'model_bert_19_10.h5py'
 
 best_model = get_model(model_name)
 custom_print(best_model)

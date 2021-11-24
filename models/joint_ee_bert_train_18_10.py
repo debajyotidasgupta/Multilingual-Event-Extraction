@@ -239,6 +239,7 @@ def get_answer_pointers(arg1start_preds, arg1end_preds, arg2start_preds, arg2end
     arg1_prob = -1.0
     arg1start = -1
     arg1end = -1
+    #FIND MAX LENGTH OF TRIGGER PHRASE AND ENTITY PHRASE
     max_ent_len = 38  # 5
     max_trig_len = 7
     for i in range(0, sent_len):
@@ -324,8 +325,10 @@ def get_pred_triples(rel, arg1s, arg1e, arg2s, arg2e, eTypes, aTypes, src_words)
         touplet = (arg1, eventIdxToName[ev], arg2,
                    argIdxToName[at])
         # same (trigger, argument) pair can not have two different role
-        if (touplet[0], touplet[1], touplet[2]) in [(t[0], t[1], t[2]) for t in touples]:
+        if (touplet[0], touplet[2]) in [(t[0], t[2]) for t in touples]:
             continue
+        # if (touplet[0], touplet[1], touplet[2]) in [(t[0], t[1], t[2]) for t in touples]:
+        #     continue
         all_touples.append(touplet)
         if not is_full_match(touplet, touples):
             touples.append(touplet)
@@ -370,9 +373,9 @@ def get_F1(data, preds):
         #                                                   preds[4][i], preds[5][i], preds[6][i], data[i].SrcWords)
         pred_triples, all_pred_triples = get_pred_triples(None,preds[0][i], preds[1][i], preds[2][i],
                                                           preds[3][i], preds[4][i], preds[5][i], data[i].SrcWords)
-        total_pred_pos += len(all_pred_triples)
-        gt_pos += len(gt_triples)
-        pred_pos += len(pred_triples)
+        total_pred_pos += len(all_pred_triples)#predicted all tuples
+        gt_pos += len(gt_triples)#actual tuples in data
+        pred_pos += len(pred_triples)#predicted unique tuples
         for gt_triple in gt_triples:
             if is_full_match(gt_triple, pred_triples):
                 correct_pos += 1
@@ -1251,7 +1254,7 @@ class Seq2SeqModel(nn.Module):
             batch_len, 4 * dec_hidden_size))).cuda()  # [bs, 4*300]
 
         # prev_tuples = torch.cat((trigger, entity, dec_inp), -1)  # [bs, 9*300]
-        prev_tuples = torch.cat((trigger, entity), -1)  # [bs, 9*300]
+        prev_tuples = torch.cat((trigger, entity), -1)  # [bs, 8*300]
         #custom_print('start decoding.....')
         if is_training:
             dec_outs = self.decoder(dec_inp, prev_tuples, dec_hid, enc_hs, src_mask, trigger, entity,
@@ -1289,7 +1292,7 @@ class Seq2SeqModel(nn.Module):
                 # prev_tuples = torch.cat(
                 #     (trigger, entity, dec_inp), -1) + prev_tuples  # [bs, 9*300]
                 prev_tuples = torch.cat(
-                    (trigger, entity), -1) + prev_tuples  # [bs, 9*300]
+                    (trigger, entity), -1) + prev_tuples  # [bs, 8*300]
                 dec_outs = self.decoder(dec_inp, prev_tuples, dec_hid, enc_hs, src_mask, trigger, entity,
                                         trigger_mask[:, t, :].squeeze(), entity_mask[:, t, :].squeeze(), is_training)
             else:
@@ -1492,7 +1495,7 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
     #print('Parameters size:', pytorch_total_params)
     custom_print('Parameters size:', pytorch_total_params)
     # print(model)
-    #custom_print(model)
+    custom_print(model)
     if torch.cuda.is_available():
         model.cuda()
     if n_gpu > 1:
@@ -1535,6 +1538,8 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
             train_samples)  # shuffle training data
         start_time = datetime.datetime.now()
         train_loss_val = 0.0
+
+        batch_count = 1
 
         for batch_idx in tqdm(range(0, batch_count)):
             batch_start = batch_idx * batch_size

@@ -11,9 +11,7 @@ final2 = []
 final3 = []
 
 for i in range(len(l1)):
-    if len(l2[i]) == 1:
-        assert len(l2[i]) == len(l3[i])
-    else:
+    if len(l3[i]) > 1:
         final1.append(l1[i])
         final2.append(l2[i])
         final3.append(l3[i])

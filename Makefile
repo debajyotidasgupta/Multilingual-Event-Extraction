@@ -18,7 +18,7 @@ sent_len: cleanup
 event_arg_gen: scripts/event_arg_gen.sh cleanup
 	sh scripts/event_arg_gen.sh data/processed
 
-cleanup: sent tuple pointer
+cleanup:
 	python3 scripts/cleanup.py data/processed/test_bengali
 	python3 scripts/cleanup.py data/processed/train_bengali
 	python3 scripts/cleanup.py data/processed/valid_bengali

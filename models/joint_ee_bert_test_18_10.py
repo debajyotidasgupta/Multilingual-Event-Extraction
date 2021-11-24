@@ -403,14 +403,13 @@ def get_F1(data, preds):
             if gt_triple[:2] in [pred[:2] for pred in pred_triples]:
                 tc += 1
 
-
-            if gt_triple[:3] in [pred[:3] for pred in pred_triples]:
+            if gt_triple[1:3] in [pred[1:3] for pred in pred_triples]:
                 ai += 1
 
             # if (gt_triple[1], gt_triple[2], gt_triple[4]) in [(pred[1], pred[2], pred[4]) for pred in pred_triples]:
             #     ro += 1
 
-            if gt_triple in [pred for pred in pred_triples]:
+            if (gt_triple[1], gt_triple[2]) in [(pred[1], pred[2]) for pred in pred_triples]:
                 ro += 1
 
     # print(total_pred_pos)
@@ -1761,7 +1760,6 @@ update_bert = 0
 bert_model_name = 'bert-base-multilingual-cased'
 bert_tokenizer = BertTokenizer.from_pretrained(
     bert_model_name, do_basic_tokenize=False)
-
 
 max_src_len = language_hyperparameters[language]['max_src_len'] # BENGALI 106 HINDI 199
 max_trg_len = language_hyperparameters[language]['max_trg_len']  # BENGALI 15 HINDI 28

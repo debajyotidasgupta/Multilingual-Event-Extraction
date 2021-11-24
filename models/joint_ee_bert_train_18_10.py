@@ -1539,6 +1539,8 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
         start_time = datetime.datetime.now()
         train_loss_val = 0.0
 
+        batch_count = 1
+
         for batch_idx in tqdm(range(0, batch_count)):
             batch_start = batch_idx * batch_size
             batch_end = min(len(cur_shuffled_train_data),

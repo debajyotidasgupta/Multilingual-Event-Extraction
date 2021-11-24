@@ -520,10 +520,10 @@ def get_max_len(sample_batch):
         if len(sample_batch[idx].SrcWords) > src_max_len:
             src_max_len = len(sample_batch[idx].SrcWords)
 
-    trg_max_len = len(sample_batch[0].TrgRels)
+    trg_max_len = len(sample_batch[0].eventTypes)
     for idx in range(1, len(sample_batch)):
-        if len(sample_batch[idx].TrgRels) > trg_max_len:
-            trg_max_len = len(sample_batch[idx].TrgRels)
+        if len(sample_batch[idx].eventTypes) > trg_max_len:
+            trg_max_len = len(sample_batch[idx].eventTypes)
 
     return src_max_len, trg_max_len
 
@@ -979,7 +979,7 @@ class Encoder(nn.Module):
 
     def forward(self, words, bert_mask, pos_tag_seq, chars, pos_seq, is_training=False):
         bert_embeds = self.bert_vec(words, bert_mask, is_training)
-        word_input = bert_embeds
+        words_input = bert_embeds
         # src_word_embeds = self.word_embeddings(words)#[bs, max_seq_len, emb_dim]
         # custom_print(word_input.shape)
         # pos_embeds = self.pos_embeddings(pos_tag_seq)
@@ -1541,6 +1541,8 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
         start_time = datetime.datetime.now()
         train_loss_val = 0.0
 
+        batch_count = 1
+
         for batch_idx in tqdm(range(0, batch_count)):
             batch_start = batch_idx * batch_size
             batch_end = min(len(cur_shuffled_train_data),
@@ -1726,18 +1728,18 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
 
 
 n_gpu = torch.cuda.device_count()
-random_seed = 1023
+random_seed = 1033
 torch.manual_seed(random_seed)
 # set_random_seeds(random_seed)
 batch_size = 32
-num_epoch = 100
+num_epoch = 10
 model_name = 1
 
 logger = open('test_18_10.log', 'w+')
 
 bert_base_size = 768
 update_bert = 0
-bert_model_name = 'bert-base-cased'
+bert_model_name = 'bert-base-multilingual-cased'
 bert_tokenizer = BertTokenizer.from_pretrained(
     bert_model_name, do_basic_tokenize=False)
 

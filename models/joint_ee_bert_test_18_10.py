@@ -31,6 +31,24 @@ import numpy as np
 import random
 import pickle
 
+import sys
+
+language_hyperparameters = {
+    'hindi':{
+        'max_src_len' : 199,
+        'max_trg_len' : 28,
+        'max_ent_len' : 68,
+        'max_trig_len': 22 
+    },
+    'bengali':{
+        'max_src_len' : 106,
+        'max_trg_len' : 15,
+        'max_ent_len' : 28,
+        'max_trig_len': 7 
+    }
+}
+
+language = sys.argv[1]
 
 def custom_print(*msg):
     for i in range(0, len(msg)):
@@ -236,8 +254,8 @@ def get_answer_pointers(arg1start_preds, arg1end_preds, arg2start_preds, arg2end
     arg1start = -1
     arg1end = -1
     #FIND MAX LENGTH OF TRIGGER PHRASE AND ENTITY PHRASE
-    max_ent_len = 68  #BENGALI 28 HINDI 68
-    max_trig_len =22  #BENGALI 7  HINDI 22 
+    max_ent_len = language_hyperparameters[language]['max_ent_len']  #BENGALI 28 HINDI 68
+    max_trig_len = language_hyperparameters[language]['max_trig_len']  #BENGALI 7  HINDI 22  
     for i in range(0, sent_len):
         for j in range(i, min(sent_len, i + max_trig_len)):
             if arg1start_preds[i] * arg1end_preds[j] > arg1_prob:
@@ -385,13 +403,13 @@ def get_F1(data, preds):
             if gt_triple[:2] in [pred[:2] for pred in pred_triples]:
                 tc += 1
 
-            if gt_triple[1:3] in [pred[1:3] for pred in pred_triples]:
+            if gt_triple[:3] in [pred[:3] for pred in pred_triples]:
                 ai += 1
 
             # if (gt_triple[1], gt_triple[2], gt_triple[4]) in [(pred[1], pred[2], pred[4]) for pred in pred_triples]:
             #     ro += 1
 
-            if (gt_triple[1], gt_triple[2]) in [(pred[1], pred[2]) for pred in pred_triples]:
+            if gt_triple in [pred for pred in pred_triples]:
                 ro += 1
 
     # print(total_pred_pos)
@@ -1727,6 +1745,8 @@ def train_model(model_id, train_samples, dev_samples, best_model_file):
 
 n_gpu = torch.cuda.device_count()
 random_seed = 1033
+if len(sys.argv)>=3:
+    random_seed = int(sys.argv[2])
 torch.manual_seed(random_seed)
 # set_random_seeds(random_seed)
 batch_size = 32
@@ -1741,8 +1761,8 @@ bert_model_name = 'bert-base-multilingual-cased'
 bert_tokenizer = BertTokenizer.from_pretrained(
     bert_model_name, do_basic_tokenize=False)
 
-max_src_len = 199  # BENGALI 106 HINDI 199
-max_trg_len = 28  # BENGALI 15 HINDI 28
+max_src_len = language_hyperparameters[language]['max_src_len'] # BENGALI 106 HINDI 199
+max_trg_len = language_hyperparameters[language]['max_trg_len']  # BENGALI 15 HINDI 28
 embedding_file = './joint_ee/w2v.txt'  # pretrained word embeddings file
 word_embed_dim = 300
 word_min_freq = 2
@@ -1790,22 +1810,22 @@ custom_print(batch_size, '\t', num_epoch)
 custom_print(enc_type)
 custom_print('loading data......')
 
-src_train_file = '../data/processed/train_hindi.sent'
-trg_train_file = '../data/processed/train_hindi.pointer'
+src_train_file = '../data/processed/train_'+language+'.sent'
+trg_train_file = '../data/processed/train_'+language+'.pointer'
 # pos_train_file = 'train_bert.pos'
 
 # call read_data() for train_set
 # train_data = read_data(src_train_file, trg_train_file, pos_train_file, 1)
 train_data = read_data(src_train_file, trg_train_file, None, 1)
 
-src_dev_file = '../data/processed/valid_hindi.sent'
-trg_dev_file = '../data/processed/valid_hindi.pointer'
+src_dev_file = '../data/processed/valid_'+language+'.sent'
+trg_dev_file = '../data/processed/valid_'+language+'.pointer'
 # pos_dev_file = 'dev_bert.pos'
 # call read_data() for dev_set
 dev_data = read_data(src_dev_file, trg_dev_file, None, 2)
 
-src_test_file = '../data/processed/test_hindi.sent'
-trg_test_file = '../data/processed/test_hindi.pointer'
+src_test_file = '../data/processed/test_'+language+'.sent'
+trg_test_file = '../data/processed/test_'+language+'.pointer'
 # pos_test_file = 'test_bert.pos'
 # call read_data() for dev_set
 test_data = read_data(src_test_file, trg_test_file, None, 3)
@@ -1853,8 +1873,8 @@ custom_print('\nTest Results\n')
 #print('\nTest Results\n')
 # src_test_file = 'test_bert.sent'
 # trg_test_file = 'test_bert.pointer'
-src_test_file = '../data/processed/test_hindi.sent'
-trg_test_file = '../data/processed/test_hindi.pointer'
+src_test_file = '../data/processed/test_'+language+'.sent'
+trg_test_file = '../data/processed/test_'+language+'.pointer'
 #pos_test_file = 'test_bert.pos'
 test_data = read_data(src_test_file, trg_test_file, None, 3)
 
